@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +40,7 @@ public class WeatherFragment extends Fragment {
     private List<Map<String,Object>> data=null;
     private ProgressDialog pDialog;
     private String action;
+    private TextView tvCity;
 
     @Nullable
     @Override
@@ -55,15 +55,14 @@ public class WeatherFragment extends Fragment {
     }
 private void initView(){
     lvWeather = (ListView) getActivity().findViewById(R.id.lvWeather);
+    tvCity = (TextView) getActivity().findViewById(R.id.tvCity);
     data=new ArrayList<>();
     adapter=new Adapter(data);
     lvWeather.setAdapter(adapter);
-    String url="https://api.thinkpage.cn/v3/weather/daily.json?key=r3b44bu4dzqzadlr&location=guangzhou&language=zh-Hans&unit=c&start=0&days=5";
+    String url="https://api.thinkpage.cn/v3/weather/daily.json?key=r3b44bu4dzqzadlr&location=beijing&language=zh-Hans&unit=c&start=0&days=5";
     action="daily";
     new WeatherTask().execute(url);
-//    url="https://api.thinkpage.cn/v3/life/suggestion.json?key=r3b44bu4dzqzadlr&location=shanghai&language=zh-Hans";
-//    action="suggestion";
-//    new WeatherTask().execute(url);
+
 }
     private class WeatherTask extends AsyncTask<String,Void,Object>{
 
@@ -88,13 +87,13 @@ private void initView(){
                 conn.connect();
                 //获得响应码
                 int code=conn.getResponseCode();
-                Log.e("cheng","***********"+code);
+                //Log.e("cheng","***********"+code);
                 if(code==200){//连接成功
                     //获取服务器返回的数据
                     inputStream=conn.getInputStream();
                     //将输入流转成字符串
                     String response=URLConnManager.converStreamToString(inputStream);
-                    Log.e("cheng","************"+response);
+                   // Log.e("cheng","************"+response);
                     //用Gson解析数据
                     Gson gson=new Gson();
                     if(action.equals("daily")){
@@ -135,13 +134,13 @@ private void initView(){
         @Override
         protected void onPostExecute(Object result) {
             super.onPostExecute(result);
-            //每次查询后清空以前查到的数据
-            data.clear();
+
             LifeSuggestion lifeSuggestion=null;
             WeatherDaily weatherDaily=null;
             //关闭进度对话框
             if(pDialog!=null){
                 pDialog.dismiss();
+
             }
 
             if(result instanceof WeatherDaily){
@@ -152,6 +151,7 @@ private void initView(){
                     data.clear();
                     adapter.notifyDataSetChanged();
                 }else{
+                    tvCity.setText(weatherDaily.getResults().get(0).getLocation().getName());
                     // 往data中填充数据
                     for(WeatherDaily.ResultsBean.DailyBean daily:weatherDaily.getResults().get(0).getDaily()){
                         Map<String,Object> row=new HashMap<>();
@@ -162,12 +162,24 @@ private void initView(){
                         row.put("direction",daily.getWind_direction());
                         data.add(row);
                     }
-                    adapter.notifyDataSetChanged();
+                   String url="https://api.thinkpage.cn/v3/life/suggestion.json?key=r3b44bu4dzqzadlr&location=beijing&language=zh-Hans";
+                    action="suggestion";
+                    new WeatherTask().execute(url);
+
                 }
             }else if(result instanceof LifeSuggestion){
                 lifeSuggestion=(LifeSuggestion)result;
-                for(int i=0;i<data.size();i++){
-                   // data.get(i).put("suggestion",lifeSuggestion)
+                LifeSuggestion.ResultsBean.SuggestionBean suggestionBean=lifeSuggestion.getResults().get(0).getSuggestion();
+                String suggestion=suggestionBean.getCar_washing().getBrief()+"洗车;"
+                                    +suggestionBean.getSport().getBrief()+"运动;"
+                                    +suggestionBean.getTravel().getBrief()+"旅游;"
+                                    +suggestionBean.getFlu().getBrief()+"感冒.";
+                if(data.size()!=0){
+                    for(int i=0;i<data.size();i++){
+                         data.get(i).put("uv","紫外线："+suggestionBean.getUv().getBrief());
+                        data.get(i).put("suggestion",suggestion);
+                    }
+                    adapter.notifyDataSetChanged();
                 }
 
             }
@@ -214,7 +226,7 @@ private void initView(){
                 viewHolder.tvTextDay= (TextView) convertView.findViewById(R.id.tvTextDay);
                 viewHolder.tvUv= (TextView) convertView.findViewById(R.id.tvUv);
                 viewHolder.tvWindDirection= (TextView) convertView.findViewById(R.id.tvWindDirection);
-
+                viewHolder.tvSuggestion= (TextView) convertView.findViewById(R.id.tvSuggestion);
 
                 convertView.setTag(viewHolder);
             }else{
@@ -230,8 +242,18 @@ private void initView(){
             viewHolder.tvTextDay.setText((String)data.get(position).get("textDay"));
             viewHolder.tvWindDirection.setText((String)data.get(position).get("direction"));
             viewHolder.tvUv.setText((String)data.get(position).get("uv"));
-            //出行建议
-
+            viewHolder.tvSuggestion.setText((String)data.get(position).get("suggestion"));
+            switch (position) {
+                case  0:
+                    viewHolder.tvDay.setText("今天");
+                    break;
+                case  1:
+                    viewHolder.tvDay.setText("明天");
+                    break;
+                case  2:
+                    viewHolder.tvDay.setText("后天");
+                    break;
+            }
 
             return convertView;
         }
@@ -250,6 +272,5 @@ private void initView(){
         Context ctx = getActivity().getBaseContext();
         int resId = getResources().getIdentifier(imageName, "mipmap", ctx.getPackageName());
         return resId;
-
     }
 }

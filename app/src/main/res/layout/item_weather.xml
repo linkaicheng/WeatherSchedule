@@ -33,13 +33,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="今天"
-                    android:id="@+id/tvDay" />
+                    android:id="@+id/tvDay"
+                    android:textColor="@color/white"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="2016-9-5"
                     android:id="@+id/tvDate"
                     android:layout_marginTop="60dp"
+                    android:textColor="@color/white"
                     />
             </LinearLayout>
             <ImageView
@@ -64,6 +66,7 @@
                         android:layout_height="wrap_content"
                         android:text="18"
                         android:textSize="30sp"
+                        android:textColor="@color/white"
                         android:id="@+id/tvTemperature" />
                     <ImageView
                         android:layout_width="wrap_content"
@@ -77,17 +80,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="多云"
-                    android:id="@+id/tvTextDay" />
+                    android:id="@+id/tvTextDay"
+                    android:textColor="@color/white"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="西北风"
-                    android:id="@+id/tvWindDirection" />
+                    android:id="@+id/tvWindDirection"
+                    android:textColor="@color/white"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="紫外线：最弱"
-                    android:id="@+id/tvUv" />
+                    android:id="@+id/tvUv"
+                    android:textColor="@color/white"/>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -96,7 +102,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="出行建议：阴天，但降水概率很低，因此您在出门的时候无须带雨伞。"
-        android:id="@+id/textView" />
+        android:id="@+id/tvSuggestion"
+        android:textColor="@color/white"/>
 
 
 </LinearLayout>

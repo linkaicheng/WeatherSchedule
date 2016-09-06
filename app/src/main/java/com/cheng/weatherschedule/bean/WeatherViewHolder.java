@@ -14,6 +14,7 @@ public  TextView tvDay;
     public TextView tvTextDay;
     public TextView tvWindDirection;
     public TextView tvUv;
+    public TextView tvSuggestion;
 
 
 }
