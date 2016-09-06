@@ -1,6 +1,7 @@
 package com.cheng.weatherschedule.fragment;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,8 +14,10 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cheng.weatherschedule.R;
+import com.cheng.weatherschedule.bean.LifeSuggestion;
 import com.cheng.weatherschedule.bean.WeatherDaily;
 import com.cheng.weatherschedule.bean.WeatherViewHolder;
 import com.cheng.weatherschedule.utils.URLConnManager;
@@ -25,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +40,7 @@ public class WeatherFragment extends Fragment {
     private Adapter adapter;
     private List<Map<String,Object>> data=null;
     private ProgressDialog pDialog;
+    private String action;
 
     @Nullable
     @Override
@@ -53,8 +58,12 @@ private void initView(){
     data=new ArrayList<>();
     adapter=new Adapter(data);
     lvWeather.setAdapter(adapter);
-    String weatherDailyUrl="https://api.thinkpage.cn/v3/weather/daily.json?key=r3b44bu4dzqzadlr&location=beijing&language=zh-Hans&unit=c&start=0&days=5";
-    new WeatherTask().execute(weatherDailyUrl);
+    String url="https://api.thinkpage.cn/v3/weather/daily.json?key=r3b44bu4dzqzadlr&location=guangzhou&language=zh-Hans&unit=c&start=0&days=5";
+    action="daily";
+    new WeatherTask().execute(url);
+//    url="https://api.thinkpage.cn/v3/life/suggestion.json?key=r3b44bu4dzqzadlr&location=shanghai&language=zh-Hans";
+//    action="suggestion";
+//    new WeatherTask().execute(url);
 }
     private class WeatherTask extends AsyncTask<String,Void,Object>{
 
@@ -75,7 +84,6 @@ private void initView(){
             try {
                 //获取连接
                 conn = URLConnManager.getHttpURLConnection(url);
-
                 //连接
                 conn.connect();
                 //获得响应码
@@ -85,13 +93,17 @@ private void initView(){
                     //获取服务器返回的数据
                     inputStream=conn.getInputStream();
                     //将输入流转成字符串
-                    String reponse=URLConnManager.converStreamToString(inputStream);
-                    Log.e("cheng","************"+reponse);
+                    String response=URLConnManager.converStreamToString(inputStream);
+                    Log.e("cheng","************"+response);
                     //用Gson解析数据
                     Gson gson=new Gson();
-                    WeatherDaily weatherDaily=gson.fromJson(reponse,WeatherDaily.class);
-                    //成功时返回的是List<Train>对象
-                    return weatherDaily;
+                    if(action.equals("daily")){
+                        WeatherDaily weatherDaily=gson.fromJson(response,WeatherDaily.class);
+                        return weatherDaily;
+                    }else if(action.equals("suggestion")){
+                        LifeSuggestion lifeSuggestion=gson.fromJson(response,LifeSuggestion.class);
+                        return lifeSuggestion;
+                    }
                 }else{//连接失败
                     result="2";
                 }
@@ -121,61 +133,55 @@ private void initView(){
         }
 
         @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
-//            //每次查询后清空以前查到的数据
-//            data.clear();
-//            List<Train> trains=null;
-//            //关闭进度对话框
-//            if(pDialog!=null){
-//                pDialog.dismiss();
-//            }
-//
-//            if(o instanceof List<?>){
-//                trains=(List<Train>)o;
-//                if(trains.size()==0){
-//                    Toast.makeText(TicketResultStep1Activity.this, "没有查询到相关的车次", Toast.LENGTH_SHORT).show();
-//                    //查询到空，将数据清空，更新界面
-//                    data.clear();
-//                    adapter.notifyDataSetChanged();
-//                }else{
-//                    // 往data中填充数据
-//                    for(Train train:trains){
-//                        Map<String,Object> row=new HashMap<>();
-//                        row.put("trainNo",train.getTrainNo());
-//                        if(train.getStartStationName().equals(train.getFromStationName())){
-//                            row.put("flg1",R.mipmap.flg_shi);
-//                        }else{
-//                            row.put("flg1",R.mipmap.flg_guo);
-//                        }
-//                        if(train.getEndStationName().equals(train.getToStationName())){
-//                            row.put("flg2",R.mipmap.flg_zhong);
-//                        }else{
-//                            row.put("flg2",R.mipmap.flg_guo);
-//                        }
-//                        row.put("timeFrom",train.getStartTime());
-//                        row.put("timeTo",train.getArriveTime());
-//                        Map<String,Seat> seats=train.getSeats();
-//                        String[] seatKey=new String[]{"seat1", "seat2", "seat3", "seat4"};
-//                        int i=0;
-//                        for(String key:seats.keySet()){
-//                            Seat seat=seats.get(key);
-//                            row.put(seatKey[i++],seat.getSeatName()+":"+seat.getSeatNum());
-//                        }
-//                        data.add(row);
-//                    }
-//                    adapter.notifyDataSetChanged();
-//                }
-//            }else if(o instanceof String){
-//                if("2".equals(o)){
-//                    Toast.makeText(TicketResultStep1Activity.this, "服务器错误", Toast.LENGTH_SHORT).show();
-//                }else if("3".equals(o)){
-//                    Toast.makeText(TicketResultStep1Activity.this, "请重新登录", Toast.LENGTH_SHORT).show();
-//                }
-//
-//            }else{
-//                Toast.makeText(TicketResultStep1Activity.this, "服务器错误", Toast.LENGTH_SHORT).show();
-//            }
+        protected void onPostExecute(Object result) {
+            super.onPostExecute(result);
+            //每次查询后清空以前查到的数据
+            data.clear();
+            LifeSuggestion lifeSuggestion=null;
+            WeatherDaily weatherDaily=null;
+            //关闭进度对话框
+            if(pDialog!=null){
+                pDialog.dismiss();
+            }
+
+            if(result instanceof WeatherDaily){
+                weatherDaily=(WeatherDaily)result;
+                if(weatherDaily==null){
+                    Toast.makeText(getActivity(), "没有查询到相关的天气信息", Toast.LENGTH_SHORT).show();
+                    //查询到空，将数据清空，更新界面
+                    data.clear();
+                    adapter.notifyDataSetChanged();
+                }else{
+                    // 往data中填充数据
+                    for(WeatherDaily.ResultsBean.DailyBean daily:weatherDaily.getResults().get(0).getDaily()){
+                        Map<String,Object> row=new HashMap<>();
+                        row.put("date",daily.getDate());
+                        row.put("codeDay",daily.getCode_day());
+                        row.put("temp",daily.getLow()+"-"+daily.getHigh());
+                        row.put("textDay",daily.getText_day());
+                        row.put("direction",daily.getWind_direction());
+                        data.add(row);
+                    }
+                    adapter.notifyDataSetChanged();
+                }
+            }else if(result instanceof LifeSuggestion){
+                lifeSuggestion=(LifeSuggestion)result;
+                for(int i=0;i<data.size();i++){
+                   // data.get(i).put("suggestion",lifeSuggestion)
+                }
+
+            }
+
+            else if(result instanceof String){
+                if("2".equals(result)){
+                    Toast.makeText(getActivity(), "服务器错误", Toast.LENGTH_SHORT).show();
+                }else if("3".equals(result)){
+                    Toast.makeText(getActivity(), "请重新登录", Toast.LENGTH_SHORT).show();
+                }
+
+            }else{
+                Toast.makeText(getActivity(), "服务器错误", Toast.LENGTH_SHORT).show();
+            }
         }
     }
     /**
@@ -197,7 +203,7 @@ private void initView(){
             //声明一个ViewHolder
             WeatherViewHolder viewHolder;
             if(convertView==null){
-                viewHolder=new WeatherViewHolder();;
+                viewHolder=new WeatherViewHolder();
                 //将转换的View对象存入缓存中
                 convertView=View.inflate(getActivity(),R.layout.item_weather,null);
                 //通过convertView对象来获得控件并将其保存到viewHolder中
@@ -218,11 +224,15 @@ private void initView(){
 
             viewHolder.tvDay.setText((String) data.get(position).get("day"));
             viewHolder.tvDate.setText((String)data.get(position).get("date"));
-            viewHolder.imWeather.setImageResource((Integer) data.get(position).get("imWeather"));
+            String s="weather"+data.get(position).get("codeDay");
+            viewHolder.imWeather.setImageResource(getResource(s));
             viewHolder.tvTemperature.setText((String)data.get(position).get("temp"));
             viewHolder.tvTextDay.setText((String)data.get(position).get("textDay"));
             viewHolder.tvWindDirection.setText((String)data.get(position).get("direction"));
             viewHolder.tvUv.setText((String)data.get(position).get("uv"));
+            //出行建议
+
+
             return convertView;
         }
 
@@ -235,5 +245,11 @@ private void initView(){
         public long getItemId(int position) {
             return 0;
         }
+    }
+    public int  getResource(String imageName) {
+        Context ctx = getActivity().getBaseContext();
+        int resId = getResources().getIdentifier(imageName, "mipmap", ctx.getPackageName());
+        return resId;
+
     }
 }
