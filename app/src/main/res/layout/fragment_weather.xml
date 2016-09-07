@@ -12,7 +12,7 @@
         android:gravity="center" >
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="350dp"
             android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="vertical" >
@@ -25,15 +25,23 @@
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
         </LinearLayout>
+
+
+
         <TextView
             android:id="@+id/tvPlus"
-            android:layout_width="50dp"
+            android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:text="+"
             android:textColor="@color/white"
            android:textSize="30sp"
-            android:paddingRight="16dp"
-            android:layout_marginRight="30dp"
+            />
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/imShare"
+            android:src="@mipmap/share"
+            android:layout_marginRight="46dp"
             />
     </LinearLayout>
 
