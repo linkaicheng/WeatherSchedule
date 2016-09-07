@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="com.cheng.weatherschedule.weather.ChangeCityActivity">
+
+    <RelativeLayout
+        android:id="@+id/searchBarContainer"
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/search_bg" >
+
+        <EditText
+            android:id="@+id/input_search_query"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="5dip"
+            android:background="@drawable/search_puin"
+            android:focusableInTouchMode="true"
+            android:imeOptions="actionDone"
+            android:maxLines="1"
+            android:paddingLeft="5dip"
+            android:paddingRight="25dip"
+            android:singleLine="true"
+            android:text=""
+            android:textSize="15dip" />
+
+        <ImageButton
+            android:id="@+id/button_search"
+            style="@android:style/Widget.Button.Inset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dip"
+            android:background="@drawable/icon_search"
+            android:contentDescription="Search..."
+            android:scaleType="fitCenter" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="6"
+        android:gravity="center"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="广州（默认）"
+            android:id="@+id/textView2"
+            android:layout_weight="2"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:src="@mipmap/s20"
+            android:layout_weight="1"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="大雨"
+            android:id="@+id/textView3"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="25-28℃"
+            android:id="@+id/textView"
+            android:layout_weight="1"
+            android:gravity="right"
+            />
+
+    </LinearLayout>
+
+    <com.cheng.weatherschedule.weather.cityList.LetterListView
+        android:id="@+id/letterListView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="5dp"
+        android:scrollbars="vertical"
+        />
+
+
+
+
+</LinearLayout>

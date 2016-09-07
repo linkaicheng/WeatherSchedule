@@ -2,6 +2,7 @@ package com.cheng.weatherschedule.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,6 +18,7 @@ import com.cheng.weatherschedule.R;
 import com.cheng.weatherschedule.bean.LifeSuggestion;
 import com.cheng.weatherschedule.bean.WeatherDaily;
 import com.cheng.weatherschedule.utils.URLConnManager;
+import com.cheng.weatherschedule.weather.ChangeCityActivity;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -41,6 +43,8 @@ public class WeatherFragment extends Fragment {
     private TextView tvWeather, tvTemp, tvWindDirection, tvUv, tvWindScale
             , tvTempToday, tvTextToday, tvTempTomorrow, tvTextTomorrow
             , tvTempAfterTomo, tvTextAfterTomo,tvDate;
+    //添加城市
+    private TextView tvPlus;
 
 
     @Nullable
@@ -75,11 +79,38 @@ public class WeatherFragment extends Fragment {
         tvTextAfterTomo = (TextView) getActivity().findViewById(R.id.tvTextAfterTomo);
         tvDate = (TextView) getActivity().findViewById(R.id.tvDate);
 
+        tvPlus = (TextView) getActivity().findViewById(R.id.tvPlus);
+        tvPlus.setOnClickListener(new tvPlusOnCkListerner());
+
         data = new ArrayList<>();
         String url = "https://api.thinkpage.cn/v3/weather/daily.json?key=r3b44bu4dzqzadlr&location=beijing&language=zh-Hans&unit=c&start=0&days=5";
         action = "daily";
         new WeatherTask().execute(url);
 
+    }
+    //点击加号，到添加城市界面
+    private class tvPlusOnCkListerner implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            Intent intent=new Intent(getActivity(), ChangeCityActivity.class);
+            startActivityForResult(intent,1);
+        }
+    }
+
+    /**
+     * 处理选择城市界面回传的城市名
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1&&requestCode==getActivity().RESULT_OK){
+            if(data!=null){
+
+            }
+        }
     }
 
     private class WeatherTask extends AsyncTask<String, Void, Object> {
@@ -197,7 +228,7 @@ public class WeatherFragment extends Fragment {
                 int resId=getResource("weather"+day1.get("codeDay"));
                 imWeather.setImageResource(resId);
                 tvWeather.setText((String)day1.get("textDay"));
-                tvTemp.setText((String)day1.get("temp"));
+                tvTemp.setText(day1.get("temp")+"℃");
                 tvWindDirection.setText((String)day1.get("direction"));
                 tvDate.setText((String)day1.get("date"));
                 tvUv.setText((String)day1.get("uv"));
@@ -209,13 +240,13 @@ public class WeatherFragment extends Fragment {
                 resId=getResource("s"+day3.get("codeDay"));
                 imWeaAfterTomo.setImageResource(resId);
 
-                tvTempToday.setText((String)day1.get("temp"));
+                tvTempToday.setText(((String)day1.get("temp")).replace("-","/"));
                 tvTextToday.setText((String)day1.get("textDay"));
 
-                tvTempTomorrow.setText((String)day2.get("temp"));
+                tvTempTomorrow.setText(((String)day2.get("temp")).replace("-","/"));
                 tvTextTomorrow.setText((String)day2.get("textDay"));
 
-                tvTempAfterTomo.setText((String)day3.get("temp"));
+                tvTempAfterTomo.setText(((String)day3.get("temp")).replace("-","/"));
                 tvTextAfterTomo.setText((String)day3.get("textDay"));
 
             } else if (result instanceof String) {
