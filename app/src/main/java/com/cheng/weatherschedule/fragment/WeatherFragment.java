@@ -1,26 +1,39 @@
 package com.cheng.weatherschedule.fragment;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cheng.weatherschedule.MainActivity;
 import com.cheng.weatherschedule.R;
 import com.cheng.weatherschedule.bean.LifeSuggestion;
 import com.cheng.weatherschedule.bean.WeatherDaily;
 import com.cheng.weatherschedule.db.CityHistory;
+import com.cheng.weatherschedule.utils.DensityUtil;
+import com.cheng.weatherschedule.utils.NetUtils;
 import com.cheng.weatherschedule.utils.URLConnManager;
 import com.cheng.weatherschedule.weather.ChangeCityActivity;
 import com.google.gson.Gson;
@@ -46,13 +59,17 @@ public class WeatherFragment extends Fragment {
     private String action;
     private TextView tvCity;
     private ImageView imWeather, imWeatherToday, imWeatherTomorrow, imWeaAfterTomo;
-    private TextView tvWeather, tvTemp, tvWindDirection, tvUv, tvWindScale
-            , tvTempToday, tvTextToday, tvTempTomorrow, tvTextTomorrow
-            , tvTempAfterTomo, tvTextAfterTomo,tvDate;
+    private TextView tvWeather, tvTemp, tvWindDirection, tvUv, tvWindScale, tvTempToday, tvTextToday, tvTempTomorrow, tvTextTomorrow, tvTempAfterTomo, tvTextAfterTomo, tvDate;
     //添加城市
     private TextView tvPlus;
     //保存天气代码
     private int codeDayId;
+    //左上角菜单
+    private ImageView immenu;
+    //菜单选项
+    private TextView tvShare, tvSetDefault, tvOut;
+    // 菜单
+    PopupWindow popupWindow;
 
 
     @Nullable
@@ -73,6 +90,7 @@ public class WeatherFragment extends Fragment {
         imWeatherToday = (ImageView) getActivity().findViewById(R.id.imWeatherToday);
         imWeatherTomorrow = (ImageView) getActivity().findViewById(R.id.imWeatherTomorrow);
         imWeaAfterTomo = (ImageView) getActivity().findViewById(R.id.imWeaAfterTomo);
+        immenu = (ImageView) getActivity().findViewById(R.id.immenu);
 
         tvWeather = (TextView) getActivity().findViewById(R.id.tvWeather);
         tvTemp = (TextView) getActivity().findViewById(R.id.tvTemp);
@@ -86,46 +104,172 @@ public class WeatherFragment extends Fragment {
         tvTempAfterTomo = (TextView) getActivity().findViewById(R.id.tvTempAfterTomo);
         tvTextAfterTomo = (TextView) getActivity().findViewById(R.id.tvTextAfterTomo);
         tvDate = (TextView) getActivity().findViewById(R.id.tvDate);
-
         tvPlus = (TextView) getActivity().findViewById(R.id.tvPlus);
+        //左上角菜单
+        immenu.setOnClickListener(new ImmenuOnCkListener());
+        //右上角添加城市
         tvPlus.setOnClickListener(new tvPlusOnCkListener());
         //每次启动显示的城市为之前（切换城市）所设定的城市，从数据库中获取
-        CityHistory helper=new CityHistory(getActivity());
-        SQLiteDatabase db=helper.getReadableDatabase();
-        Cursor cursor=db.query("cities",null,null,null,null,null,"id desc","1");
-        String cityName=null;
-        if(cursor.moveToNext()){
+        CityHistory helper = new CityHistory(getActivity());
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.query("cities", null, null, null, null, null, "id desc", "1");
+        String cityName = null;
+        if (cursor.moveToNext()) {
             try {
-                cityName=cursor.getString(cursor.getColumnIndex("rec"));
-                cityName=URLEncoder.encode(cityName,"utf-8");
+                cityName = cursor.getString(cursor.getColumnIndex("rec"));
+                cityName = URLEncoder.encode(cityName, "utf-8");
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-        }else{
-            cityName="beijing";
+        } else {
+            cityName = "beijing";
         }
         data = new ArrayList<>();
         String url = null;
         url = "https://api.thinkpage.cn/v3/weather/daily.json?key=r3b44bu4dzqzadlr&language=zh-Hans&unit=c&start=0&days=5"
-                            +"&location="+cityName ;
+                + "&location=" + cityName;
         action = "daily";
+        //网络是否可用
+        if(!(NetUtils.check(getActivity()))){
+            Toast.makeText(getActivity(), "网络不可用", Toast.LENGTH_SHORT).show();
+            return;
+        }
         new WeatherTask().execute(url);
     }
-    //点击加号，到添加城市界面
-    private class tvPlusOnCkListener implements View.OnClickListener{
+
+    //左上角菜单点击监听
+    private class ImmenuOnCkListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            Intent intent=new Intent(getActivity(), ChangeCityActivity.class);
-            intent.putExtra("city",tvCity.getText().toString());
-            intent.putExtra("codeDay",codeDayId);
-            intent.putExtra("temp",tvTemp.getText().toString());
-            intent.putExtra("weather",tvWeather.getText().toString());
-            startActivityForResult(intent,1);
+                showPw();
+        }
+    }
+
+    /**
+     * 显示菜单
+     */
+    private void showPw() {
+        View contentView = LayoutInflater.from((MainActivity)getActivity()).inflate(R.layout.menu_item, null);
+        tvShare = (TextView) contentView.findViewById(R.id.tvShare);
+        tvSetDefault = (TextView) contentView.findViewById(R.id.tvSetDefault);
+        tvOut = (TextView) contentView.findViewById(R.id.tvOut);
+        tvShare.setOnClickListener(new MenuItemOnCkListener());
+        tvSetDefault.setOnClickListener(new MenuItemOnCkListener());
+        tvOut.setOnClickListener(new MenuItemOnCkListener());
+        popupWindow = new PopupWindow(contentView);
+        int dip = 100;
+        int px = DensityUtil.dip2px(getActivity(), dip);
+        popupWindow.setWidth(px);
+        px = DensityUtil.dip2px(getActivity(), 120);
+        popupWindow.setHeight(px);
+
+        //背景色，透明
+        popupWindow.setBackgroundDrawable(new ColorDrawable(
+                Color.TRANSPARENT));
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.showAsDropDown(immenu);
+
+    }
+
+    /**
+     * 左上角菜单选项的点击监听
+     */
+    private class MenuItemOnCkListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.tvShare:
+                    popupWindow.dismiss();
+                    //网络是否可用
+                    if(!(NetUtils.check(getActivity()))){
+                        Toast.makeText(getActivity(), "网络不可用", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    sendMessage();
+                    break;
+                case R.id.tvSetDefault:
+                    Toast.makeText(getActivity(), "设默认", Toast.LENGTH_SHORT).show();
+                    popupWindow.dismiss();
+                    break;
+                case R.id.tvOut:
+                    Toast.makeText(getActivity(), "退出", Toast.LENGTH_SHORT).show();
+                    getActivity().finish();
+                    popupWindow.dismiss();
+                    break;
+            }
+
+        }
+    }
+
+    //以短信的形式分享天气信息
+    private void sendMessage() {
+        //读通读录权限（兼容android M（api23)需要这段代码）
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            int hasWriteContactsPermission = getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS);
+            if (hasWriteContactsPermission
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 123);
+            }
+        }
+        //从通讯录中拿到用户名和电话
+        //获得内容解析器
+        ContentResolver cr = getActivity().getContentResolver();
+        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        //查询联系人数据
+        Cursor cursor = cr.query(uri, null, null, null, null);
+        List<String> contacts = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));//联系人姓名
+            String phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));//联系人号码
+            contacts.add(name + "(" + phone + ")");
+        }
+        cursor.close();
+        if (contacts.size() == 0) {
+            new AlertDialog.Builder(getActivity()).setTitle("请选择")
+                    .setMessage("通讯录为空")
+                    .setNegativeButton("取消", null).show();
+        } else {
+            final String[] items = new String[contacts.size()];
+            contacts.toArray(items);
+            new AlertDialog.Builder(getActivity())
+                    .setTitle("请选择")
+                    .setItems(items, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String select = items[which];
+                            String phone = select.substring(select.indexOf("(") + 1, select.indexOf(")"));
+                            Intent intent = new Intent(Intent.ACTION_SENDTO);
+                            String sms=tvDate.getText().toString()+",城市："+tvCity.getText().toString()
+                                    +",温度："+tvTemp.getText().toString()
+                                    +",天气："+tvWeather.getText().toString()
+                                    +","+tvWindDirection.getText().toString()
+                                    +","+tvUv.getText().toString();
+                            intent.setData(Uri.parse( "smsto:"+phone));
+                            //携带额外数据
+                            intent.putExtra( "sms_body", sms);
+                            startActivity(intent);
+
+                        }
+                    }).setNegativeButton("取消", null).show();
+        }
+    }
+
+    //点击加号，到添加城市界面
+    private class tvPlusOnCkListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(getActivity(), ChangeCityActivity.class);
+            intent.putExtra("city", tvCity.getText().toString());
+            intent.putExtra("codeDay", codeDayId);
+            intent.putExtra("temp", tvTemp.getText().toString());
+            intent.putExtra("weather", tvWeather.getText().toString());
+            startActivityForResult(intent, 1);
         }
     }
 
     /**
      * 处理选择城市界面回传的城市名,根据回传的城市名更新界面
+     *
      * @param requestCode
      * @param resultCode
      * @param data
@@ -133,23 +277,28 @@ public class WeatherFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==1&&resultCode==getActivity().RESULT_OK){
-            if(data!=null){
+        if (requestCode == 1 && resultCode == getActivity().RESULT_OK) {
+            if (data != null) {
                 try {
-                    String city=data.getStringExtra("city");
+                    String city = data.getStringExtra("city");
                     //将查询的城市保存到数据库
-                    CityHistory helper=new CityHistory(getActivity());
-                    SQLiteDatabase db=helper.getWritableDatabase();
-                    ContentValues values=new ContentValues();
-                    values.put("rec",city);
-                    db.insert("cities",null,values);
+                    CityHistory helper = new CityHistory(getActivity());
+                    SQLiteDatabase db = helper.getWritableDatabase();
+                    ContentValues values = new ContentValues();
+                    values.put("rec", city);
+                    db.insert("cities", null, values);
                     db.close();
                     helper.close();
 
-                    city=URLEncoder.encode(city,"utf-8");
+                    city = URLEncoder.encode(city, "utf-8");
                     String url = "https://api.thinkpage.cn/v3/weather/daily.json?key=r3b44bu4dzqzadlr&language=zh-Hans&unit=c&start=0&days=5";
-                    url=url+"&location="+city;
+                    url = url + "&location=" + city;
                     action = "daily";
+                    //网络是否可用
+                    if(!(NetUtils.check(getActivity()))){
+                        Toast.makeText(getActivity(), "网络不可用", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     new WeatherTask().execute(url);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -253,6 +402,11 @@ public class WeatherFragment extends Fragment {
                     }
                     String url = "https://api.thinkpage.cn/v3/life/suggestion.json?key=r3b44bu4dzqzadlr&location=beijing&language=zh-Hans";
                     action = "suggestion";
+                    //网络是否可用
+                    if(!(NetUtils.check(getActivity()))){
+                        Toast.makeText(getActivity(), "网络不可用", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     new WeatherTask().execute(url);
 
                 }
@@ -272,31 +426,31 @@ public class WeatherFragment extends Fragment {
                 Map<String, Object> day1 = data.get(0);
                 Map<String, Object> day2 = data.get(1);
                 Map<String, Object> day3 = data.get(2);
-                int resId=getResource("weather"+day1.get("codeDay"));
+                int resId = getResource("weather" + day1.get("codeDay"));
 
                 imWeather.setImageResource(resId);
-                tvWeather.setText((String)day1.get("textDay"));
-                tvTemp.setText(day1.get("temp")+"℃");
-                tvWindDirection.setText((String)day1.get("direction"));
-                tvDate.setText((String)day1.get("date"));
-                tvUv.setText((String)day1.get("uv"));
-                tvWindScale.setText("风力等级："+day1.get("windScale")+"级");
-                resId=getResource("s"+day1.get("codeDay"));
-                codeDayId=resId;
+                tvWeather.setText((String) day1.get("textDay"));
+                tvTemp.setText(day1.get("temp") + "℃");
+                tvWindDirection.setText("风向："+ day1.get("direction"));
+                tvDate.setText((String) day1.get("date"));
+                tvUv.setText((String) day1.get("uv"));
+                tvWindScale.setText("风力等级：" + day1.get("windScale") + "级");
+                resId = getResource("s" + day1.get("codeDay"));
+                codeDayId = resId;
                 imWeatherToday.setImageResource(resId);
-                resId=getResource("s"+day2.get("codeDay"));
+                resId = getResource("s" + day2.get("codeDay"));
                 imWeatherTomorrow.setImageResource(resId);
-                resId=getResource("s"+day3.get("codeDay"));
+                resId = getResource("s" + day3.get("codeDay"));
                 imWeaAfterTomo.setImageResource(resId);
 
-                tvTempToday.setText(((String)day1.get("temp")).replace("-","/"));
-                tvTextToday.setText((String)day1.get("textDay"));
+                tvTempToday.setText(((String) day1.get("temp")).replace("-", "/"));
+                tvTextToday.setText((String) day1.get("textDay"));
 
-                tvTempTomorrow.setText(((String)day2.get("temp")).replace("-","/"));
-                tvTextTomorrow.setText((String)day2.get("textDay"));
+                tvTempTomorrow.setText(((String) day2.get("temp")).replace("-", "/"));
+                tvTextTomorrow.setText((String) day2.get("textDay"));
 
-                tvTempAfterTomo.setText(((String)day3.get("temp")).replace("-","/"));
-                tvTextAfterTomo.setText((String)day3.get("textDay"));
+                tvTempAfterTomo.setText(((String) day3.get("temp")).replace("-", "/"));
+                tvTextAfterTomo.setText((String) day3.get("textDay"));
 
             } else if (result instanceof String) {
                 if ("2".equals(result)) {

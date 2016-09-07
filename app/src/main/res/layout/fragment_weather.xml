@@ -10,9 +10,15 @@
         android:layout_height="50dp"
         android:orientation="horizontal"
         android:gravity="center" >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/immenu"
+            android:src="@mipmap/menu"
 
+            />
         <LinearLayout
-            android:layout_width="350dp"
+            android:layout_width="300dp"
             android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="vertical" >
@@ -36,13 +42,7 @@
             android:textColor="@color/white"
            android:textSize="30sp"
             />
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/imShare"
-            android:src="@mipmap/share"
-            android:layout_marginRight="46dp"
-            />
+
     </LinearLayout>
 
 
@@ -63,14 +63,14 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/weather4"
+                android:src="@mipmap/weather99"
                 android:id="@+id/imWeather"
                 android:layout_marginLeft="20dp"
                 />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="中雨"
+                android:text="未知"
                 android:textSize="18sp"
                 android:paddingLeft="50dp"
                 android:textColor="@color/white"
@@ -89,7 +89,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="26-33℃"
+                android:text=""
                 android:textSize="40sp"
                 android:textColor="@color/white"
                 android:id="@+id/tvTemp"
@@ -99,7 +99,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="东北风"
+                android:text=""
                 android:textSize="15sp"
                 android:textColor="@color/white"
                android:gravity="right"
@@ -108,7 +108,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="2016-9-7"
+                android:text=""
                 android:textSize="15sp"
                 android:gravity="right"
                 android:textColor="@color/white"
@@ -116,7 +116,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="紫外线:最弱"
+                android:text=""
                 android:gravity="right"
                 android:textSize="15sp"
                 android:textColor="@color/white"
@@ -125,7 +125,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="风力等级：1级"
+                android:text=""
                android:textSize="15sp"
                 android:gravity="right"
                 android:textColor="@color/white"
@@ -152,7 +152,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/imWeatherToday"
-                android:src="@mipmap/s5"
+                android:src="@mipmap/s99"
                 />
             <TextView
                 android:layout_width="wrap_content"
@@ -164,14 +164,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="16/20"
+                android:text=""
                 android:textSize="15sp"
                 android:textColor="@color/white"
                 android:id="@+id/tvTempToday" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="小雨"
+                android:text=""
                 android:textSize="15sp"
                 android:gravity="center"
                 android:textColor="@color/white"
@@ -190,7 +190,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/imWeatherTomorrow"
-                android:src="@mipmap/s3"
+                android:src="@mipmap/s99"
                 />
             <TextView
                 android:layout_width="wrap_content"
@@ -202,14 +202,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="16/20"
+                android:text=""
                 android:textSize="15sp"
                 android:textColor="@color/white"
                 android:id="@+id/tvTempTomorrow" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="小雨"
+                android:text=""
                 android:textSize="15sp"
                 android:gravity="center"
                 android:textColor="@color/white"
@@ -228,7 +228,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/imWeaAfterTomo"
-                android:src="@mipmap/s4"
+                android:src="@mipmap/s99"
                 />
             <TextView
                 android:layout_width="wrap_content"
@@ -240,14 +240,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="16/20"
+                android:text=""
                 android:textSize="15sp"
                 android:textColor="@color/white"
                 android:id="@+id/tvTempAfterTomo" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="小雨"
+                android:text=""
                 android:textSize="15sp"
                 android:gravity="center"
                 android:textColor="@color/white"
