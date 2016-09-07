@@ -1,12 +1,13 @@
 package com.cheng.weatherschedule.weather;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cheng.weatherschedule.R;
@@ -28,11 +29,20 @@ import java.util.List;
 public class ChangeCityActivity extends Activity {
 private EditText input_search_query;
     private ImageButton button_search;
+    private TextView tvCity;
+    private ImageView imWeather;
+    private TextView tvWeather;
+    private TextView tvTemp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_city);
+
+        imWeather = (ImageView)findViewById(R.id.imWeather);
+        tvCity = (TextView)findViewById(R.id.tvCity);
+        tvWeather = (TextView)findViewById(R.id.tvWeather);
+        tvTemp = (TextView)findViewById(R.id.tvTemp);
 
         LetterListView letterListView = (LetterListView) findViewById(R.id.letterListView);
         input_search_query = (EditText)findViewById(R.id.input_search_query);
@@ -54,13 +64,24 @@ private EditText input_search_query;
                 input_search_query.setText(tvname.getText().toString());
             }
         });
+
+        //默认天气情况
+        Intent intent=getIntent();
+        tvCity.setText(intent.getStringExtra("city")+"(默认)");
+        imWeather.setImageResource(intent.getIntExtra("codeDay",100));
+        tvWeather.setText(intent.getStringExtra("weather"));
+        tvTemp.setText(intent.getStringExtra("temp"));
+
         button_search.setOnClickListener(new BtnSearchOnCkListener());
     }
     //点击查询按钮，将城市名回传
     private class BtnSearchOnCkListener implements View.OnClickListener{
         @Override
         public void onClick(View v) {
-
+            Intent intent=getIntent();
+            intent.putExtra("city",input_search_query.getText().toString());
+            setResult(RESULT_OK,intent);
+            finish();
         }
     }
     public List<TestData> getTestDatas() {
@@ -74,10 +95,8 @@ private EditText input_search_query;
             byte[] buffer = new byte[is.available()];is.read(buffer);
             //将字节数组转换为以UTF-8编码的字符串
             String json = new String(buffer, "UTF-8");
-
             JSONObject jsonObject = new JSONObject(json);
-
-//		//解析info数组，解析中括号括起来的内容就表示一个数组，使用JSONArray对象解析
+        	//解析info数组，解析中括号括起来的内容就表示一个数组，使用JSONArray对象解析
             JSONArray array = jsonObject.getJSONArray("City");
 
             for(int i = 0; i < array.length(); i++) {
@@ -119,11 +138,6 @@ private EditText input_search_query;
         return datas;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
+
 
 }

@@ -56,12 +56,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="广州（默认）"
-            android:id="@+id/textView2"
+            android:id="@+id/tvCity"
             android:layout_weight="2"/>
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imageView"
+            android:id="@+id/imWeather"
             android:src="@mipmap/s20"
             android:layout_weight="1"
             />
@@ -69,13 +69,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="大雨"
-            android:id="@+id/textView3"
+            android:id="@+id/tvWeather"
             android:layout_weight="1"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="25-28℃"
-            android:id="@+id/textView"
+            android:id="@+id/tvTemp"
             android:layout_weight="1"
             android:gravity="right"
             />

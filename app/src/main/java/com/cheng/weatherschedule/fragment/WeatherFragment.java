@@ -1,8 +1,11 @@
 package com.cheng.weatherschedule.fragment;
 
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,6 +20,7 @@ import android.widget.Toast;
 import com.cheng.weatherschedule.R;
 import com.cheng.weatherschedule.bean.LifeSuggestion;
 import com.cheng.weatherschedule.bean.WeatherDaily;
+import com.cheng.weatherschedule.db.CityHistory;
 import com.cheng.weatherschedule.utils.URLConnManager;
 import com.cheng.weatherschedule.weather.ChangeCityActivity;
 import com.google.gson.Gson;
@@ -24,7 +28,9 @@ import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +51,8 @@ public class WeatherFragment extends Fragment {
             , tvTempAfterTomo, tvTextAfterTomo,tvDate;
     //添加城市
     private TextView tvPlus;
+    //保存天气代码
+    private int codeDayId;
 
 
     @Nullable
@@ -80,25 +88,44 @@ public class WeatherFragment extends Fragment {
         tvDate = (TextView) getActivity().findViewById(R.id.tvDate);
 
         tvPlus = (TextView) getActivity().findViewById(R.id.tvPlus);
-        tvPlus.setOnClickListener(new tvPlusOnCkListerner());
-
+        tvPlus.setOnClickListener(new tvPlusOnCkListener());
+        //每次启动显示的城市为之前（切换城市）所设定的城市，从数据库中获取
+        CityHistory helper=new CityHistory(getActivity());
+        SQLiteDatabase db=helper.getReadableDatabase();
+        Cursor cursor=db.query("cities",null,null,null,null,null,"id desc","1");
+        String cityName=null;
+        if(cursor.moveToNext()){
+            try {
+                cityName=cursor.getString(cursor.getColumnIndex("rec"));
+                cityName=URLEncoder.encode(cityName,"utf-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }else{
+            cityName="beijing";
+        }
         data = new ArrayList<>();
-        String url = "https://api.thinkpage.cn/v3/weather/daily.json?key=r3b44bu4dzqzadlr&location=beijing&language=zh-Hans&unit=c&start=0&days=5";
+        String url = null;
+        url = "https://api.thinkpage.cn/v3/weather/daily.json?key=r3b44bu4dzqzadlr&language=zh-Hans&unit=c&start=0&days=5"
+                            +"&location="+cityName ;
         action = "daily";
         new WeatherTask().execute(url);
-
     }
     //点击加号，到添加城市界面
-    private class tvPlusOnCkListerner implements View.OnClickListener{
+    private class tvPlusOnCkListener implements View.OnClickListener{
         @Override
         public void onClick(View v) {
             Intent intent=new Intent(getActivity(), ChangeCityActivity.class);
+            intent.putExtra("city",tvCity.getText().toString());
+            intent.putExtra("codeDay",codeDayId);
+            intent.putExtra("temp",tvTemp.getText().toString());
+            intent.putExtra("weather",tvWeather.getText().toString());
             startActivityForResult(intent,1);
         }
     }
 
     /**
-     * 处理选择城市界面回传的城市名
+     * 处理选择城市界面回传的城市名,根据回传的城市名更新界面
      * @param requestCode
      * @param resultCode
      * @param data
@@ -106,8 +133,27 @@ public class WeatherFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==1&&requestCode==getActivity().RESULT_OK){
+        if(requestCode==1&&resultCode==getActivity().RESULT_OK){
             if(data!=null){
+                try {
+                    String city=data.getStringExtra("city");
+                    //将查询的城市保存到数据库
+                    CityHistory helper=new CityHistory(getActivity());
+                    SQLiteDatabase db=helper.getWritableDatabase();
+                    ContentValues values=new ContentValues();
+                    values.put("rec",city);
+                    db.insert("cities",null,values);
+                    db.close();
+                    helper.close();
+
+                    city=URLEncoder.encode(city,"utf-8");
+                    String url = "https://api.thinkpage.cn/v3/weather/daily.json?key=r3b44bu4dzqzadlr&language=zh-Hans&unit=c&start=0&days=5";
+                    url=url+"&location="+city;
+                    action = "daily";
+                    new WeatherTask().execute(url);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
 
             }
         }
@@ -194,6 +240,7 @@ public class WeatherFragment extends Fragment {
                 } else {
                     tvCity.setText(weatherDaily.getResults().get(0).getLocation().getName());
                     // 往data中填充数据
+                    data.clear();
                     for (WeatherDaily.ResultsBean.DailyBean daily : weatherDaily.getResults().get(0).getDaily()) {
                         Map<String, Object> row = new HashMap<>();
                         row.put("date", daily.getDate());
@@ -226,6 +273,7 @@ public class WeatherFragment extends Fragment {
                 Map<String, Object> day2 = data.get(1);
                 Map<String, Object> day3 = data.get(2);
                 int resId=getResource("weather"+day1.get("codeDay"));
+
                 imWeather.setImageResource(resId);
                 tvWeather.setText((String)day1.get("textDay"));
                 tvTemp.setText(day1.get("temp")+"℃");
@@ -234,6 +282,7 @@ public class WeatherFragment extends Fragment {
                 tvUv.setText((String)day1.get("uv"));
                 tvWindScale.setText("风力等级："+day1.get("windScale")+"级");
                 resId=getResource("s"+day1.get("codeDay"));
+                codeDayId=resId;
                 imWeatherToday.setImageResource(resId);
                 resId=getResource("s"+day2.get("codeDay"));
                 imWeatherTomorrow.setImageResource(resId);
