@@ -9,7 +9,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="100dp"
-        android:layout_height="120dp"
+        android:layout_height="160dp"
         android:background="@color/black">
 
         <TextView
@@ -28,6 +28,16 @@
             android:layout_height="wrap_content"
             android:text="设为默认"
             android:id="@+id/tvSetDefault"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="出行建议"
+            android:id="@+id/tvSuggestion"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="15dp"
             android:textColor="@color/white"

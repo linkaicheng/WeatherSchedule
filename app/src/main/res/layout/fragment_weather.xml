@@ -31,9 +31,6 @@
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
         </LinearLayout>
-
-
-
         <TextView
             android:id="@+id/tvPlus"
             android:layout_width="30dp"
@@ -44,8 +41,6 @@
             />
 
     </LinearLayout>
-
-
 
     <LinearLayout
         android:orientation="horizontal"
@@ -252,10 +247,6 @@
                 android:gravity="center"
                 android:textColor="@color/white"
                 android:id="@+id/tvTextAfterTomo" />
-
         </LinearLayout>
-
     </LinearLayout>
-
-
 </LinearLayout>

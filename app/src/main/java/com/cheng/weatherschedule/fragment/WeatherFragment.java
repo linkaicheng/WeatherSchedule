@@ -1,7 +1,6 @@
 package com.cheng.weatherschedule.fragment;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -19,6 +18,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,9 +67,12 @@ public class WeatherFragment extends Fragment {
     //左上角菜单
     private ImageView immenu;
     //菜单选项
-    private TextView tvShare, tvSetDefault, tvOut;
+    private TextView tvShare, tvSetDefault, tvOut,tvSuggestion;
     // 菜单
     PopupWindow popupWindow;
+    //保存当前的城市名
+    private String cityName;
+    private String suggestion;
 
 
     @Nullable
@@ -113,7 +116,6 @@ public class WeatherFragment extends Fragment {
         CityHistory helper = new CityHistory(getActivity());
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.query("cities", null, null, null, null, null, "id desc", "1");
-        String cityName = null;
         if (cursor.moveToNext()) {
             try {
                 cityName = cursor.getString(cursor.getColumnIndex("rec"));
@@ -153,14 +155,16 @@ public class WeatherFragment extends Fragment {
         tvShare = (TextView) contentView.findViewById(R.id.tvShare);
         tvSetDefault = (TextView) contentView.findViewById(R.id.tvSetDefault);
         tvOut = (TextView) contentView.findViewById(R.id.tvOut);
+        tvSuggestion = (TextView) contentView.findViewById(R.id.tvSuggestion);
         tvShare.setOnClickListener(new MenuItemOnCkListener());
         tvSetDefault.setOnClickListener(new MenuItemOnCkListener());
         tvOut.setOnClickListener(new MenuItemOnCkListener());
+        tvSuggestion.setOnClickListener(new MenuItemOnCkListener());
         popupWindow = new PopupWindow(contentView);
         int dip = 100;
         int px = DensityUtil.dip2px(getActivity(), dip);
         popupWindow.setWidth(px);
-        px = DensityUtil.dip2px(getActivity(), 120);
+        px = DensityUtil.dip2px(getActivity(), 160);
         popupWindow.setHeight(px);
 
         //背景色，透明
@@ -188,8 +192,33 @@ public class WeatherFragment extends Fragment {
                     sendMessage();
                     break;
                 case R.id.tvSetDefault:
-                    Toast.makeText(getActivity(), "设默认", Toast.LENGTH_SHORT).show();
                     popupWindow.dismiss();
+                    //将查询的城市保存到数据库
+                    CityHistory helper = new CityHistory(getActivity());
+                    SQLiteDatabase db = helper.getWritableDatabase();
+                    ContentValues values = new ContentValues();
+                    values.put("rec", tvCity.getText().toString());
+                    db.insert("cities", null, values);
+                    db.close();
+                    helper.close();
+                    Toast.makeText(getActivity(), "已将"+tvCity.getText().toString()+"设为默认城市", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.tvSuggestion:
+                    popupWindow.dismiss();
+                    //用一个对话框显示出行建议
+                    AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
+                    builder.setTitle("建议");
+                    TextView tvSuggestion=new TextView(getActivity());
+                    tvSuggestion.setPadding(0,50,0,0);
+                    tvSuggestion.setText(suggestion);
+                    builder.setView(tvSuggestion);
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.show();
                     break;
                 case R.id.tvOut:
                     Toast.makeText(getActivity(), "退出", Toast.LENGTH_SHORT).show();
@@ -239,11 +268,12 @@ public class WeatherFragment extends Fragment {
                             String select = items[which];
                             String phone = select.substring(select.indexOf("(") + 1, select.indexOf(")"));
                             Intent intent = new Intent(Intent.ACTION_SENDTO);
-                            String sms=tvDate.getText().toString()+",城市："+tvCity.getText().toString()
-                                    +",温度："+tvTemp.getText().toString()
-                                    +",天气："+tvWeather.getText().toString()
-                                    +","+tvWindDirection.getText().toString()
-                                    +","+tvUv.getText().toString();
+                            String sms="城市："+tvCity.getText().toString()
+                                    +"，温度："+tvTemp.getText().toString()
+                                    +"，天气："+tvWeather.getText().toString()
+                                    +"，"+tvWindDirection.getText().toString()
+                                    +"，"+tvUv.getText().toString()
+                                    +"("+tvDate.getText().toString()+")";
                             intent.setData(Uri.parse( "smsto:"+phone));
                             //携带额外数据
                             intent.putExtra( "sms_body", sms);
@@ -280,19 +310,11 @@ public class WeatherFragment extends Fragment {
         if (requestCode == 1 && resultCode == getActivity().RESULT_OK) {
             if (data != null) {
                 try {
-                    String city = data.getStringExtra("city");
-                    //将查询的城市保存到数据库
-                    CityHistory helper = new CityHistory(getActivity());
-                    SQLiteDatabase db = helper.getWritableDatabase();
-                    ContentValues values = new ContentValues();
-                    values.put("rec", city);
-                    db.insert("cities", null, values);
-                    db.close();
-                    helper.close();
+                   cityName = data.getStringExtra("city");
 
-                    city = URLEncoder.encode(city, "utf-8");
+                    cityName = URLEncoder.encode(cityName, "utf-8");
                     String url = "https://api.thinkpage.cn/v3/weather/daily.json?key=r3b44bu4dzqzadlr&language=zh-Hans&unit=c&start=0&days=5";
-                    url = url + "&location=" + city;
+                    url = url + "&location=" + cityName;
                     action = "daily";
                     //网络是否可用
                     if(!(NetUtils.check(getActivity()))){
@@ -400,7 +422,8 @@ public class WeatherFragment extends Fragment {
                         row.put("windScale", daily.getWind_scale());
                         data.add(row);
                     }
-                    String url = "https://api.thinkpage.cn/v3/life/suggestion.json?key=r3b44bu4dzqzadlr&location=beijing&language=zh-Hans";
+                    String url = "https://api.thinkpage.cn/v3/life/suggestion.json?key=r3b44bu4dzqzadlr&language=zh-Hans" +
+                            "&location="+cityName;
                     action = "suggestion";
                     //网络是否可用
                     if(!(NetUtils.check(getActivity()))){
@@ -413,15 +436,13 @@ public class WeatherFragment extends Fragment {
             } else if (result instanceof LifeSuggestion) {
                 lifeSuggestion = (LifeSuggestion) result;
                 LifeSuggestion.ResultsBean.SuggestionBean suggestionBean = lifeSuggestion.getResults().get(0).getSuggestion();
-//                String suggestion=suggestionBean.getCar_washing().getBrief()+"洗车;"
-//                                    +suggestionBean.getSport().getBrief()+"运动;"
-//                                    +suggestionBean.getTravel().getBrief()+"旅游;"
-//                                    +suggestionBean.getFlu().getBrief()+"感冒.";
+               suggestion="洗车："+suggestionBean.getCar_washing().getBrief()+"；"
+                            +"运动：" +suggestionBean.getSport().getBrief()+"；"
+                            +"旅游："+suggestionBean.getTravel().getBrief();
+
                 if (data.size() != 0) {
-                    for (int i = 0; i < data.size(); i++) {
-                        data.get(i).put("uv", "紫外线：" + suggestionBean.getUv().getBrief());
+                        data.get(0).put("uv", "紫外线：" + suggestionBean.getUv().getBrief());
                         //data.get(i).put("suggestion",suggestion);
-                    }
                 }
                 Map<String, Object> day1 = data.get(0);
                 Map<String, Object> day2 = data.get(1);
