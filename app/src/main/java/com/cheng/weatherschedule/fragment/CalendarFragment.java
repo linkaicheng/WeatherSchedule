@@ -1,5 +1,6 @@
 package com.cheng.weatherschedule.fragment;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import android.widget.ViewFlipper;
 
 import com.cheng.weatherschedule.R;
 import com.cheng.weatherschedule.calendar.CalendarAdapter;
+import com.cheng.weatherschedule.calendar.DayPlanActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,6 +41,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_calendar,container,false);
     }
+
+private ImageView imNow;
 
 
     private GestureDetector gestureDetector = null;
@@ -77,6 +81,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener{
         currentMonth = (TextView) getActivity().findViewById(R.id.currentMonth);
         prevMonth = (ImageView) getActivity().findViewById(R.id.prevMonth);
         nextMonth = (ImageView) getActivity().findViewById(R.id.nextMonth);
+        imNow = (ImageView) getActivity().findViewById(R.id.imNow);
         setListener();
 
         gestureDetector = new GestureDetector(getActivity(), new MyGestureListener());
@@ -87,6 +92,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener{
         gridView.setAdapter(calV);
         flipper.addView(gridView, 0);
         addTextToTopTextView(currentMonth);
+        imNow.setOnClickListener(this);
     }
 
     private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -139,6 +145,26 @@ public class CalendarFragment extends Fragment implements View.OnClickListener{
         gridView.setAdapter(calV);
         gvFlag++;
         addTextToTopTextView(currentMonth); // 移动到上一月后，将当月显示在头标题中
+        flipper.addView(gridView, gvFlag);
+
+        flipper.setInAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.push_right_in));
+        flipper.setOutAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.push_right_out));
+        flipper.showPrevious();
+        flipper.removeViewAt(0);
+    }
+    /**
+     * 移动到当前月
+     *
+     * @param gvFlag
+     */
+    private void enterCurrenMonth(int gvFlag) {
+        addGridView(); // 添加一个gridView
+        jumpMonth=0; // 置零回到当前月
+
+        calV = new CalendarAdapter(getActivity(), getActivity().getResources(), jumpMonth, jumpYear, year_c, month_c, day_c);
+        gridView.setAdapter(calV);
+        gvFlag++;
+        addTextToTopTextView(currentMonth); // 移动到当前月后，将当月显示在头标题中
         flipper.addView(gridView, gvFlag);
 
         flipper.setInAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.push_right_in));
@@ -205,6 +231,12 @@ public class CalendarFragment extends Fragment implements View.OnClickListener{
                     String scheduleYear = calV.getShowYear();
                     String scheduleMonth = calV.getShowMonth();
                     Toast.makeText(getActivity(), scheduleYear + "-" + scheduleMonth + "-" + scheduleDay,Toast.LENGTH_LONG).show();
+
+
+                    //到当日计划界面
+                    Intent intent=new Intent(getActivity(), DayPlanActivity.class);
+                    intent.putExtra("date",scheduleYear + "-" + scheduleMonth + "-" + scheduleDay);
+                    startActivity(intent);
                     // Toast.makeText(getActivity, "点击了该条目",
                     // Toast.LENGTH_SHORT).show();
                 }
@@ -227,6 +259,9 @@ public class CalendarFragment extends Fragment implements View.OnClickListener{
                 break;
             case R.id.prevMonth: // 上一个月
                 enterPrevMonth(gvFlag);
+                break;
+            case R.id.imNow:
+                enterCurrenMonth(gvFlag);
                 break;
             default:
                 break;
