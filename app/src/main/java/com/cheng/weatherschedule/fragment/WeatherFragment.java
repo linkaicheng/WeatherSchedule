@@ -27,7 +27,6 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cheng.weatherschedule.MainActivity;
 import com.cheng.weatherschedule.R;
 import com.cheng.weatherschedule.bean.LifeSuggestion;
 import com.cheng.weatherschedule.bean.WeatherDaily;
@@ -61,7 +60,7 @@ public class WeatherFragment extends Fragment {
     private ImageView imWeather, imWeatherToday, imWeatherTomorrow, imWeaAfterTomo;
     private TextView tvWeather, tvTemp, tvWindDirection, tvUv, tvWindScale, tvTempToday, tvTextToday, tvTempTomorrow, tvTextTomorrow, tvTempAfterTomo, tvTextAfterTomo, tvDate;
     //添加城市
-    private TextView tvPlus;
+    private TextView tvChangeCity;
     //保存天气代码
     private int codeDayId;
     //左上角菜单
@@ -87,6 +86,44 @@ public class WeatherFragment extends Fragment {
         initView();
     }
 
+    /**
+     * 让fragment可见时才去网络请求
+     *
+     * @param// isVisibleToUser
+     */
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser){
+            //每次启动显示的城市为之前（切换城市）所设定的城市，从数据库中获取
+
+            CityHistory helper = new CityHistory(getActivity());
+            SQLiteDatabase db = helper.getReadableDatabase();
+            Cursor cursor = db.query("cities", null, null, null, null, null, "id desc", "1");
+            if (cursor.moveToNext()) {
+                try {
+                    cityName = cursor.getString(cursor.getColumnIndex("rec"));
+                    cityName = URLEncoder.encode(cityName, "utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                cityName = "beijing";
+            }
+            data = new ArrayList<>();
+            String url = null;
+            url = "https://api.thinkpage.cn/v3/weather/daily.json?key=r3b44bu4dzqzadlr&language=zh-Hans&unit=c&start=0&days=5"
+                    + "&location=" + cityName;
+            action = "daily";
+        //网络是否可用
+        if(!(NetUtils.check(getActivity()))){
+            Toast.makeText(getActivity(), "网络不可用", Toast.LENGTH_SHORT).show();
+            return;
+        }
+            new WeatherTask().execute(url);
+        }
+    }
+
     private void initView() {
         tvCity = (TextView) getActivity().findViewById(R.id.tvCity);
         imWeather = (ImageView) getActivity().findViewById(R.id.imWeather);
@@ -94,6 +131,8 @@ public class WeatherFragment extends Fragment {
         imWeatherTomorrow = (ImageView) getActivity().findViewById(R.id.imWeatherTomorrow);
         imWeaAfterTomo = (ImageView) getActivity().findViewById(R.id.imWeaAfterTomo);
         immenu = (ImageView) getActivity().findViewById(R.id.immenu);
+        tvChangeCity = (TextView) getActivity().findViewById(R.id.tvChangeCity);
+
 
         tvWeather = (TextView) getActivity().findViewById(R.id.tvWeather);
         tvTemp = (TextView) getActivity().findViewById(R.id.tvTemp);
@@ -107,36 +146,10 @@ public class WeatherFragment extends Fragment {
         tvTempAfterTomo = (TextView) getActivity().findViewById(R.id.tvTempAfterTomo);
         tvTextAfterTomo = (TextView) getActivity().findViewById(R.id.tvTextAfterTomo);
         tvDate = (TextView) getActivity().findViewById(R.id.tvDate);
-        tvPlus = (TextView) getActivity().findViewById(R.id.tvPlus);
+        //右上角添加城市
+        tvChangeCity.setOnClickListener(new tvChangeCityOnCkListener());
         //左上角菜单
         immenu.setOnClickListener(new ImmenuOnCkListener());
-        //右上角添加城市
-        tvPlus.setOnClickListener(new tvPlusOnCkListener());
-        //每次启动显示的城市为之前（切换城市）所设定的城市，从数据库中获取
-        CityHistory helper = new CityHistory(getActivity());
-        SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.query("cities", null, null, null, null, null, "id desc", "1");
-        if (cursor.moveToNext()) {
-            try {
-                cityName = cursor.getString(cursor.getColumnIndex("rec"));
-                cityName = URLEncoder.encode(cityName, "utf-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        } else {
-            cityName = "beijing";
-        }
-        data = new ArrayList<>();
-        String url = null;
-        url = "https://api.thinkpage.cn/v3/weather/daily.json?key=r3b44bu4dzqzadlr&language=zh-Hans&unit=c&start=0&days=5"
-                + "&location=" + cityName;
-        action = "daily";
-        //网络是否可用
-        if(!(NetUtils.check(getActivity()))){
-            Toast.makeText(getActivity(), "网络不可用", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        new WeatherTask().execute(url);
     }
 
     //左上角菜单点击监听
@@ -151,7 +164,7 @@ public class WeatherFragment extends Fragment {
      * 显示菜单
      */
     private void showPw() {
-        View contentView = LayoutInflater.from((MainActivity)getActivity()).inflate(R.layout.menu_item, null);
+        View contentView = LayoutInflater.from(getActivity()).inflate(R.layout.menu_item, null);
         tvShare = (TextView) contentView.findViewById(R.id.tvShare);
         tvSetDefault = (TextView) contentView.findViewById(R.id.tvSetDefault);
         tvOut = (TextView) contentView.findViewById(R.id.tvOut);
@@ -285,7 +298,7 @@ public class WeatherFragment extends Fragment {
     }
 
     //点击加号，到添加城市界面
-    private class tvPlusOnCkListener implements View.OnClickListener {
+    private class tvChangeCityOnCkListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(getActivity(), ChangeCityActivity.class);

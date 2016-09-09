@@ -32,13 +32,15 @@
 
         </LinearLayout>
         <TextView
-            android:id="@+id/tvPlus"
+            android:id="@+id/tvChangeCity"
             android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:text="+"
+            android:clickable="true"
             android:textColor="@color/white"
            android:textSize="30sp"
             />
+
 
     </LinearLayout>
 
