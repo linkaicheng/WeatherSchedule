@@ -21,7 +21,6 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.cheng.weatherschedule.R;
@@ -230,8 +229,7 @@ private ImageView imNow;
                     // //这一天的阴历
                     String scheduleYear = calV.getShowYear();
                     String scheduleMonth = calV.getShowMonth();
-                    Toast.makeText(getActivity(), scheduleYear + "-" + scheduleMonth + "-" + scheduleDay,Toast.LENGTH_LONG).show();
-
+                    //Toast.makeText(getActivity(), scheduleYear + "-" + scheduleMonth + "-" + scheduleDay,Toast.LENGTH_LONG).show();
 
                     //到当日计划界面
                     Intent intent=new Intent(getActivity(), DayPlanActivity.class);

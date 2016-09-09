@@ -20,11 +20,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="计划名称："
+            android:layout_gravity="center"
             />
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/edtTitle" />
+            android:id="@+id/edtTitle"
+            android:background="@drawable/search_bg"
+            />
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
@@ -40,7 +43,35 @@ android:gravity="right"
         <EditText
             android:layout_width="282dp"
             android:layout_height="wrap_content"
-            android:id="@+id/edtPlace" />
+            android:id="@+id/edtPlace"
+            android:background="@drawable/search_bg"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="right"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="详细说明："
+            android:layout_gravity="center"
+            android:inputType="textMultiLine"
+            />
+        <EditText
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/edtExplain"
+
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/search_bg"
+
+            />
+
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
@@ -55,18 +86,19 @@ android:gravity="right"
             android:text="时间："
              />
         <TextView
-            android:layout_width="265dp"
+            android:layout_width="245dp"
             android:layout_height="wrap_content"
-            android:text="22:22"
             android:id="@+id/tvTimeShow"
             android:gravity="center"
+            android:background="@drawable/search_bg"
             />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
             android:id="@+id/imSetTime"
             android:src="@mipmap/forward_25"
+            android:layout_gravity="center"
             />
 
     </LinearLayout>
@@ -84,46 +116,25 @@ android:gravity="right"
             android:text="提醒时间："
             />
         <TextView
-            android:layout_width="265dp"
+            android:layout_width="245dp"
             android:layout_height="wrap_content"
-            android:text="22:22"
             android:id="@+id/tvRemTimShow"
             android:gravity="center"
+            android:background="@drawable/search_bg"
             />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
             android:id="@+id/imSetRemTime"
             android:src="@mipmap/forward_25"
-
+android:layout_gravity="center"
             />
 
     </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="right"
-        >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="详细说明："
-            />
-        <EditText
-            android:layout_width="280dp"
-            android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
-            android:ems="10"
-            android:id="@+id/edtExplain"
-            android:layout_gravity="center_horizontal"
-android:background="@drawable/search_bg"
 
-            />
 
-    </LinearLayout>
+
 
     <LinearLayout
         android:orientation="horizontal"

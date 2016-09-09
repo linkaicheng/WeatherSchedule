@@ -19,7 +19,7 @@ public class PlanHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String sql="create table plans(id integer primary key autoincrement,title text," +
+        String sql="create table plans(id integer primary key autoincrement,date text,title text," +
                 "place text,time text,remindTime text,explain text)";
         db.execSQL(sql);
     }
