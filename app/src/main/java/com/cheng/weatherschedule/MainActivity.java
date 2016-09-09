@@ -74,11 +74,9 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case  1:
                     rgMain.check(R.id.rbCalendar);
-
                     break;
                 case  2:
                     rgMain.check(R.id.rbRemind);
-
                     break;
             }
         }

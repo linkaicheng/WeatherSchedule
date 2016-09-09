@@ -58,7 +58,8 @@ public class DayPlanActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case  R.id.tvPlus://添加计划
-
+Intent intent=new Intent(DayPlanActivity.this,AddPlanActivity.class);
+                startActivity(intent);
                 break;
         }
     }
