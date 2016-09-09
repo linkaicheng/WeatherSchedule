@@ -25,7 +25,7 @@ public CityHistory(Context context){
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        String sql="drop table if exit cities";
+        String sql="drop table if exist cities";
         db.execSQL(sql);
         this.onCreate(db);
     }

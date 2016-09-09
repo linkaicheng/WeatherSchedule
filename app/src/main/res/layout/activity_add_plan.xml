@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="计划名称："
-            android:id="@+id/tvTitle" />
+            />
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,7 +36,7 @@ android:gravity="right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="地点："
-            android:id="@+id/tvPlace" />
+             />
         <EditText
             android:layout_width="282dp"
             android:layout_height="wrap_content"
@@ -53,12 +53,12 @@ android:gravity="right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="时间："
-            android:id="@+id/tvTime" />
+             />
         <TextView
             android:layout_width="265dp"
             android:layout_height="wrap_content"
             android:text="22:22"
-            android:id="@+id/textView"
+            android:id="@+id/tvTimeShow"
             android:gravity="center"
             />
 
@@ -82,7 +82,7 @@ android:gravity="right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="提醒时间："
-            android:id="@+id/tvRemindTime" />
+            />
         <TextView
             android:layout_width="265dp"
             android:layout_height="wrap_content"
@@ -111,13 +111,13 @@ android:gravity="right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="详细说明："
-            android:id="@+id/tvExplain" />
+            />
         <EditText
             android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"
             android:ems="10"
-            android:id="@+id/editText"
+            android:id="@+id/edtExplain"
             android:layout_gravity="center_horizontal"
 android:background="@drawable/search_bg"
 

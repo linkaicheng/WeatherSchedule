@@ -10,6 +10,7 @@ public class DayPlanViewHolder {
 public TextView tvTime;
     public TextView tvPlanTitle;
     public ImageView imDelete;
+    public TextView tvPlanId;
 
 }
 

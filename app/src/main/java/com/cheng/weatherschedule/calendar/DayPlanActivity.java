@@ -14,7 +14,6 @@ import com.cheng.weatherschedule.R;
 import com.cheng.weatherschedule.bean.DayPlanViewHolder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,15 +49,13 @@ public class DayPlanActivity extends AppCompatActivity implements View.OnClickLi
         lvPlan.setAdapter(adapter);
         //添加计划设置监听
         tvPlus.setOnClickListener(this);
-
-
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case  R.id.tvPlus://添加计划
-Intent intent=new Intent(DayPlanActivity.this,AddPlanActivity.class);
+                Intent intent=new Intent(DayPlanActivity.this,AddPlanActivity.class);
                 startActivity(intent);
                 break;
         }
@@ -84,6 +81,7 @@ Intent intent=new Intent(DayPlanActivity.this,AddPlanActivity.class);
                 viewHolder.tvTime= (TextView) convertView.findViewById(R.id.tvTime);
                 viewHolder.imDelete= (ImageView) convertView.findViewById(R.id.imDelete);
                 viewHolder.tvPlanTitle= (TextView) convertView.findViewById(R.id.tvPlanTitle);
+                viewHolder.tvPlanId= (TextView) convertView.findViewById(R.id.tvPlanId);
                 convertView.setTag(viewHolder);
             }else{
                 viewHolder= (DayPlanViewHolder) convertView.getTag();
@@ -91,6 +89,7 @@ Intent intent=new Intent(DayPlanActivity.this,AddPlanActivity.class);
             viewHolder.tvTime.setText((String)data.get(position).get("time"));
             viewHolder.tvPlanTitle.setText((String)data.get(position).get("title"));
             viewHolder.imDelete.setImageResource(R.mipmap.delete3);
+            viewHolder.tvPlanId.setText((String)data.get(position).get("id"));
             return convertView;
         }
 
@@ -108,12 +107,7 @@ Intent intent=new Intent(DayPlanActivity.this,AddPlanActivity.class);
     private List<Map<String,Object>> getDate(){
         List<Map<String,Object>> data=new ArrayList<>();
         Map<String ,Object> row;
-        for(int i=0;i<15;i++){
-            row=new HashMap<>();
-            row.put("time","23:00");
-            row.put("title","睡觉");
-            data.add(row);
-        }
+
         return data;
     }
 }
