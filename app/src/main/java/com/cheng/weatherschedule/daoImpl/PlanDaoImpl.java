@@ -2,6 +2,7 @@ package com.cheng.weatherschedule.daoImpl;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.cheng.weatherschedule.bean.Plan;
@@ -69,7 +70,20 @@ public class PlanDaoImpl implements PlanDao {
 
     @Override
     public Plan findById(int id) {
-        return null;
+        SQLiteDatabase db=helper.getReadableDatabase();
+        Plan plan=null;
+        String sql="select * from plans where id=?";
+        Cursor cursor=db.rawQuery(sql,new String[]{String.valueOf(id)});
+        if(cursor.moveToNext()){
+            plan=new Plan();
+            plan.setTitle(cursor.getString(cursor.getColumnIndex("title")));
+            plan.setExplain(cursor.getString(cursor.getColumnIndex("explain")));
+            plan.setPlace(cursor.getString(cursor.getColumnIndex("place")));
+            plan.setRemindTime(cursor.getString(cursor.getColumnIndex("remindTime")));
+            plan.setTime(cursor.getString(cursor.getColumnIndex("time")));
+        }
+
+        return plan;
     }
 
     @Override

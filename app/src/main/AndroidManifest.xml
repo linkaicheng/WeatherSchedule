@@ -27,7 +27,8 @@
         </activity>
         <activity android:name=".weather.ChangeCityActivity" />
         <activity android:name=".calendar.DayPlanActivity" />
-        <activity android:name=".calendar.AddPlanActivity"></activity>
+        <activity android:name=".calendar.AddPlanActivity" />
+        <activity android:name=".calendar.EditPlanActivity"></activity>
     </application>
 
 </manifest>

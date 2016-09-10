@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -22,9 +21,8 @@ import java.util.Date;
 
 public class AddPlanActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText edtTitle, edtPlace;//标题
-    private TextView tvTimeShow, tvRemTimShow, tvCancel, tvSave;//时间，提醒时间，取消，保存
+    private TextView tvTimeShow, tvRemTimShow, tvCancel, tvSave,tvSetTime,tvSetRemTime;//时间，提醒时间，取消，保存
     private EditText edtExplain;//详细说明
-    private ImageView imSetTime, imSetRemTime;//设置时间
     private String date;
 
     @Override
@@ -42,13 +40,13 @@ public class AddPlanActivity extends AppCompatActivity implements View.OnClickLi
         edtExplain = (EditText) findViewById(R.id.edtExplain);
         tvCancel = (TextView) findViewById(R.id.tvCancel);
         tvSave = (TextView) findViewById(R.id.tvSave);
-        imSetTime = (ImageView) findViewById(R.id.imSetTime);
-        imSetRemTime = (ImageView) findViewById(R.id.imSetRemTime);
+        tvSetTime = (TextView) findViewById(R.id.tvSetTime);
+        tvSetRemTime = (TextView) findViewById(R.id.tvSetRemTime);
 
         tvSave.setOnClickListener(this);
         tvCancel.setOnClickListener(this);
-        imSetTime.setOnClickListener(this);
-        imSetRemTime.setOnClickListener(this);
+        tvSetTime.setOnClickListener(this);
+        tvSetRemTime.setOnClickListener(this);
         //获取日期
         Intent intent = getIntent();
         date = intent.getStringExtra("date");
@@ -66,40 +64,49 @@ public class AddPlanActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.tvCancel:
                 finish();
                 break;
-            case R.id.imSetTime://选择时间
-                Calendar calendar = Calendar.getInstance();
-                new TimePickerDialog(AddPlanActivity.this
-                        , new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        tvTimeShow.setText(hourOfDay + ":" + minute);
-                    }
-                }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
+            case R.id.tvSetTime://选择时间
+                selectTime(tvTimeShow);
                 break;
-            case R.id.imSetRemTime://选择提醒时间
-                Calendar calendar2 = Calendar.getInstance();
-                new TimePickerDialog(AddPlanActivity.this
-                        , new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        tvRemTimShow.setText(hourOfDay + ":" + minute);
-                    }
-                }, calendar2.get(Calendar.HOUR_OF_DAY), calendar2.get(Calendar.MINUTE), true).show();
+            case R.id.tvSetRemTime://选择提醒时间
+                selectTime(tvRemTimShow);
                 break;
             case R.id.tvSave://保存，将计划保存到数据库
-                String title = edtTitle.getText().toString();
-                PlanDao planDao = new PlanDaoImpl(AddPlanActivity.this);
-                Plan plan = new Plan(title, date, edtPlace.getText().toString()
-                        , tvTimeShow.getText().toString(), tvRemTimShow.getText().toString()
-                        , edtExplain.getText().toString());
-                long count = planDao.addPlan(plan);
-                if (count == -1) {
-                    Toast.makeText(AddPlanActivity.this, "保存失败", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(AddPlanActivity.this, "保存成功", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
+                savePlan();
                 break;
         }
+    }
+
+    /**
+     * 保存计划
+     */
+    private void savePlan() {
+        String title = edtTitle.getText().toString();
+        PlanDao planDao = new PlanDaoImpl(AddPlanActivity.this);
+        Plan plan = new Plan(title, date, edtPlace.getText().toString()
+                , tvTimeShow.getText().toString(), tvRemTimShow.getText().toString()
+                , edtExplain.getText().toString());
+        long count = planDao.addPlan(plan);
+        if (count == -1) {
+            Toast.makeText(AddPlanActivity.this, "保存失败", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(AddPlanActivity.this, "保存成功", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    }
+
+    /**
+     * 弹出选择时间对话框
+     *
+     * @param tvTimeSet
+     */
+    private void selectTime(final TextView tvTimeSet) {
+        Calendar calendar = Calendar.getInstance();
+        new TimePickerDialog(AddPlanActivity.this
+                , new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                tvTimeSet.setText(hourOfDay + ":" + minute);
+            }
+        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
     }
 }
