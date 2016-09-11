@@ -16,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:gravity="right"
         >
         <TextView
             android:layout_width="wrap_content"
@@ -24,7 +25,7 @@
             android:layout_gravity="center"
             />
         <EditText
-            android:layout_width="match_parent"
+            android:layout_width="260dp"
             android:layout_height="wrap_content"
             android:id="@+id/edtEdtitle"
             android:background="@drawable/search_bg"
@@ -42,7 +43,7 @@
             android:text="地点："
             />
         <EditText
-            android:layout_width="282dp"
+            android:layout_width="260dp"
             android:layout_height="wrap_content"
             android:id="@+id/edtEdPlace"
             android:background="@drawable/search_bg"
@@ -64,7 +65,7 @@
             android:inputType="textMultiLine"
             />
         <EditText
-            android:layout_width="280dp"
+            android:layout_width="260dp"
             android:layout_height="wrap_content"
             android:id="@+id/edtEdExplain"
 
@@ -87,7 +88,7 @@
             android:text="时间："
             />
         <TextView
-            android:layout_width="225dp"
+            android:layout_width="205dp"
             android:layout_height="wrap_content"
             android:id="@+id/tvEdTimeShow"
             android:gravity="center"
@@ -103,9 +104,6 @@
             android:gravity="center"
             android:background="@drawable/search_bg"
             />
-
-
-
     </LinearLayout>
 
     <LinearLayout
@@ -121,7 +119,7 @@
             android:text="提醒时间："
             />
         <TextView
-            android:layout_width="225dp"
+            android:layout_width="205dp"
             android:layout_height="wrap_content"
             android:id="@+id/tvEdRemTimShow"
             android:gravity="center"
@@ -129,7 +127,7 @@
             />
         <TextView
             android:id="@+id/tvEdSetRemTime"
-            android:layout_width="fill_parent"
+            android:layout_width="55dp"
             android:layout_height="wrap_content"
             android:text="▼"
             android:textSize="22sp"
@@ -146,7 +144,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="50dp"
         android:layout_gravity="center_horizontal"
         android:weightSum="2"
         android:background="@color/gray"
@@ -155,7 +153,7 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="50dp"
             android:text="取消"
             android:id="@+id/tvEdCancel"
             android:gravity="center"
@@ -170,7 +168,7 @@
             />
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="50dp"
             android:text="保存"
             android:id="@+id/tvEdSave"
             android:gravity="center"

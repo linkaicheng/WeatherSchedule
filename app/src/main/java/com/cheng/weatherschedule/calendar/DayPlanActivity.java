@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -21,7 +22,9 @@ import com.cheng.weatherschedule.bean.DayPlanViewHolder;
 import com.cheng.weatherschedule.dao.PlanDao;
 import com.cheng.weatherschedule.daoImpl.PlanDaoImpl;
 import com.cheng.weatherschedule.db.PlanHelper;
+import com.cheng.weatherschedule.remind.LongRunningService;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -90,7 +93,17 @@ public class DayPlanActivity extends AppCompatActivity implements View.OnClickLi
                 startActivity(intent);
                 break;
             case R.id.imDelete://删除当天所有计划
+                PlanDao planDao=new PlanDaoImpl(DayPlanActivity.this);
+                List<Integer> ids=planDao.findIdsByDate(date);
+                Log.e("cheng","**********ids*"+ids);
                deleteDayPlan();
+                //再次开启LongRunningService这个服务
+                Intent serviceIntent = new Intent(this, LongRunningService.class);
+                if(ids!=null&&ids.size()!=0){
+                    serviceIntent.putExtra("ids", (Serializable) ids);
+                }
+                //开启Service
+                startService(serviceIntent);
                 break;
         }
     }
@@ -110,7 +123,7 @@ public class DayPlanActivity extends AppCompatActivity implements View.OnClickLi
         }else{
             builder.setTitle("确认删除");
             builder.setIcon(R.mipmap.warn2);
-            builder.setMessage("确定要删除当天所有计划吗？");
+            builder.setMessage("确定要删除当天所有计划吗?");
             builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -193,12 +206,37 @@ public class DayPlanActivity extends AppCompatActivity implements View.OnClickLi
 
         @Override
         public void onClick(View v) {
-            int count = planDao.deletePlan(id);
-            data.remove(position);
-            adapter.notifyDataSetChanged();
-            if (count != 0) {
-                Toast.makeText(DayPlanActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
-            }
+            AlertDialog.Builder builder=new AlertDialog.Builder(DayPlanActivity.this);
+            builder.setTitle("确认删除");
+            builder.setIcon(R.mipmap.warn2);
+            builder.setMessage("确定要删除该计划吗?");
+            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    int count = planDao.deletePlan(id);
+                    Log.e("cheng","************count*"+count);
+                    data.remove(position);
+                    adapter.notifyDataSetChanged();
+                    if (count != 0) {
+                        Toast.makeText(DayPlanActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
+                        //再次开启LongRunningService这个服务,以取消提醒。
+                        Intent serviceIntent = new Intent(DayPlanActivity.this, LongRunningService.class);
+                        serviceIntent.putExtra("id",id);
+                        Log.e("cheng","**********id**"+id);
+                        //开启关闭Service
+                        startService(serviceIntent);
+                    }
+                }
+            });
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.show();
+
+
         }
     }
 

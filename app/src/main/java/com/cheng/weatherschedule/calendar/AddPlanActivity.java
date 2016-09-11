@@ -14,6 +14,7 @@ import com.cheng.weatherschedule.R;
 import com.cheng.weatherschedule.bean.Plan;
 import com.cheng.weatherschedule.dao.PlanDao;
 import com.cheng.weatherschedule.daoImpl.PlanDaoImpl;
+import com.cheng.weatherschedule.remind.LongRunningService;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -90,6 +91,10 @@ public class AddPlanActivity extends AppCompatActivity implements View.OnClickLi
             Toast.makeText(AddPlanActivity.this, "保存失败", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(AddPlanActivity.this, "保存成功", Toast.LENGTH_SHORT).show();
+            //再次开启LongRunningService这个服务，以添加提醒
+          Intent serviceIntent = new Intent(this, LongRunningService.class);
+            //开启关闭Service
+            startService(serviceIntent);
             finish();
         }
     }

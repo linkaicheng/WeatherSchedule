@@ -54,12 +54,9 @@ public class URLConnManager {
                 stringBuilder.append("&");
             }
             stringBuilder.append(URLEncoder.encode(pair.getName(), "UTF-8"));//将
-            // Log.i("My12306", "******" + pair.getName());
             stringBuilder.append("=");
             stringBuilder.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
-            //  Log.i("My12306", "******" + pair.getValue());
         }
-        // Log.i("My12306", "******" + stringBuilder.toString());
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
         writer.write(stringBuilder.toString());
         writer.flush();

@@ -29,6 +29,11 @@
         <activity android:name=".calendar.DayPlanActivity" />
         <activity android:name=".calendar.AddPlanActivity" />
         <activity android:name=".calendar.EditPlanActivity"></activity>
+        <service android:name=".remind.LongRunningService">
+        </service>
+
+        <receiver android:name=".remind.AlarmReceiver" >
+        </receiver>
     </application>
 
 </manifest>

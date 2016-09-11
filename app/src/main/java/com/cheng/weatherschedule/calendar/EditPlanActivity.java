@@ -14,6 +14,7 @@ import com.cheng.weatherschedule.R;
 import com.cheng.weatherschedule.bean.Plan;
 import com.cheng.weatherschedule.dao.PlanDao;
 import com.cheng.weatherschedule.daoImpl.PlanDaoImpl;
+import com.cheng.weatherschedule.remind.LongRunningService;
 
 import java.util.Calendar;
 
@@ -68,9 +69,16 @@ public class EditPlanActivity extends AppCompatActivity implements View.OnClickL
                 finish();
                 break;
             case  R.id.tvEdSave:
-                saveChange();
-                Toast.makeText(EditPlanActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
-                finish();
+                int count=saveChange();
+                if(count!=0){
+                    Toast.makeText(EditPlanActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
+                    //再次开启LongRunningService这个服务，以修改提醒
+                    Intent serviceIntent = new Intent(this, LongRunningService.class);
+                    //开启Service
+                    startService(serviceIntent);
+                    finish();
+                }
+
                 break;
             case  R.id.tvEdSetTime:
                 selectTime(tvEdTimeShow);
@@ -92,7 +100,7 @@ public class EditPlanActivity extends AppCompatActivity implements View.OnClickL
         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
     }
     //保存修改
-    private void saveChange(){
+    private int saveChange(){
         Plan plan=new Plan();
         plan.setTime(tvEdTimeShow.getText().toString());
         plan.setTitle(edtEdtitle.getText().toString());
@@ -103,6 +111,7 @@ public class EditPlanActivity extends AppCompatActivity implements View.OnClickL
         plan.setExplain(edtEdExplain.getText().toString());
         plan.setId(planId);
         PlanDao planDao=new PlanDaoImpl(EditPlanActivity.this);
-        planDao.updatePlan(plan);
+       int count= planDao.updatePlan(plan);
+        return count;
     }
 }

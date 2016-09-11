@@ -9,6 +9,7 @@ import com.cheng.weatherschedule.bean.Plan;
 import com.cheng.weatherschedule.dao.PlanDao;
 import com.cheng.weatherschedule.db.PlanHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -87,7 +88,35 @@ public class PlanDaoImpl implements PlanDao {
     }
 
     @Override
+    public List<Integer> findIdsByDate(String date) {
+        SQLiteDatabase db=helper.getReadableDatabase();
+        List<Integer> ids=new ArrayList<>();
+        Cursor cursor=db.query("plans",new String[]{},"date=?",new String[]{date},null,null,null);
+        if(cursor.moveToNext()){
+            ids.add(cursor.getInt(cursor.getColumnIndex("id")));
+        }
+
+        return ids;
+    }
+
+    @Override
     public List<Plan> findAll() {
-        return null;
+
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Plan plan=null;
+        List<Plan> plans=new ArrayList<Plan>();
+        Cursor cursor=db.query("plans",null,null,null,null,null,null);
+        while(cursor.moveToNext()){
+            plan=new Plan();
+            plan.setId(cursor.getInt(cursor.getColumnIndex("id")));
+            plan.setTitle(cursor.getString(cursor.getColumnIndex("title")));
+            plan.setDate(cursor.getString(cursor.getColumnIndex("date")));
+            plan.setPlace(cursor.getString(cursor.getColumnIndex("place")));
+            plan.setExplain(cursor.getString(cursor.getColumnIndex("explain")));
+            plan.setRemindTime(cursor.getString(cursor.getColumnIndex("remindTime")));
+            plan.setTime(cursor.getString(cursor.getColumnIndex("time")));
+            plans.add(plan);
+        }
+        return plans;
     }
 }

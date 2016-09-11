@@ -1,5 +1,6 @@
 package com.cheng.weatherschedule;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -11,6 +12,7 @@ import com.cheng.weatherschedule.adapter.MyFragmentAdapter;
 import com.cheng.weatherschedule.fragment.CalendarFragment;
 import com.cheng.weatherschedule.fragment.RemindFragment;
 import com.cheng.weatherschedule.fragment.WeatherFragment;
+import com.cheng.weatherschedule.remind.LongRunningService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private RadioGroup rgMain;
     private ViewPager vpMain;
     List<Fragment> fragments;
+    private Intent serviceIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +30,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initView();
         initViewPage();
+        serviceIntent = new Intent(this, LongRunningService.class);
+        //开启关闭Service
+        startService(serviceIntent);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //在Activity被关闭后，关闭Service
+       // stopService(serviceIntent);
+    }
+
     private void initView(){
         rbWeather = (RadioButton)findViewById(R.id.rbWeather);
         rbCalendar = (RadioButton)findViewById(R.id.rbCalendar);
