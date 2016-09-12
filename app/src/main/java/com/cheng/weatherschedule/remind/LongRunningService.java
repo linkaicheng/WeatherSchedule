@@ -1,12 +1,16 @@
 package com.cheng.weatherschedule.remind;
 
 import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v7.app.NotificationCompat;
 
+import com.cheng.weatherschedule.MainActivity;
+import com.cheng.weatherschedule.R;
 import com.cheng.weatherschedule.bean.Plan;
 import com.cheng.weatherschedule.dao.PlanDao;
 import com.cheng.weatherschedule.daoImpl.PlanDaoImpl;
@@ -47,8 +51,16 @@ public class LongRunningService extends Service {
                 }
             }
         }
-
-                //手动返回START_STICKY，亲测当service因内存不足被kill，当内存又有的时候，service又被重新创建
+        //设为前台线程
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        NotificationCompat.Builder builder=new NotificationCompat.Builder(this);
+        builder.setSmallIcon(R.mipmap.icon);
+        builder.setContentTitle("天气日程通");
+        builder.setContentText("running");
+        Notification noti=builder.build();
+        startForeground(12346, noti);
+        //手动返回START_STICKY，亲测当service因内存不足被kill，当内存又有的时候，service又被重新创建
         flags = START_STICKY;
         return super.onStartCommand(intent, flags, startId);
     }
@@ -64,6 +76,8 @@ public class LongRunningService extends Service {
         }
         Intent sevice = new Intent(this, LongRunningService.class);
         this.startService(sevice);
+        //
+        stopForeground(true);
     }
 
     /**

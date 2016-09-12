@@ -74,7 +74,8 @@ public class EditPlanActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(EditPlanActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
                     //再次开启LongRunningService这个服务，以修改提醒
                     Intent serviceIntent = new Intent(this, LongRunningService.class);
-                    //开启Service
+                    //关闭后重新开启Service
+                    stopService(serviceIntent);
                     startService(serviceIntent);
                     finish();
                 }

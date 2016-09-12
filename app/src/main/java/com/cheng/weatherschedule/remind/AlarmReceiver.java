@@ -35,8 +35,6 @@ public class AlarmReceiver extends BroadcastReceiver {
             for(Plan plan:plans){
                 if(plan.getRemindTime().equals(calendar.get(Calendar.HOUR_OF_DAY)
                         +":"+calendar.get(Calendar.MINUTE))){
-
-
                     title=plan.getTitle();
                     text=plan.getExplain();
                     //设置通知内容并在onReceive()这个函数执行时开启
@@ -63,8 +61,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                     //再次开启LongRunningService这个服务
                     Intent i = new Intent(context, LongRunningService.class);
                     context.startService(i);
-
-
                 }
             }
         }
