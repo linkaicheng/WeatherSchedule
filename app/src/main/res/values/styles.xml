@@ -30,5 +30,7 @@
         <item name="android:textColor">#ff000000</item>
         <item name="android:textSize">16sp</item>
     </style>
-
+    <style name="NOTITLE" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+    </style>
 </resources>
