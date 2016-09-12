@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -93,18 +92,8 @@ public class DayPlanActivity extends AppCompatActivity implements View.OnClickLi
                 startActivity(intent);
                 break;
             case R.id.imDelete://删除当天所有计划
-                PlanDao planDao=new PlanDaoImpl(DayPlanActivity.this);
-                List<Integer> ids=planDao.findIdsByDate(date);
-                Log.e("cheng","**********ids*"+ids);
                deleteDayPlan();
-                //再次开启LongRunningService这个服务
-                Intent serviceIntent = new Intent(this, LongRunningService.class);
-//                if(ids!=null&&ids.size()!=0){
-//                    serviceIntent.putExtra("ids", (Serializable) ids);
-//                }
-                stopService(serviceIntent);
-                //开启Service
-                startService(serviceIntent);
+
                 break;
         }
     }
@@ -128,10 +117,19 @@ public class DayPlanActivity extends AppCompatActivity implements View.OnClickLi
             builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+
+                    //删数据库的记录
                     PlanDao planDao=new PlanDaoImpl(DayPlanActivity.this);
                     planDao.deletePlanByDate(date);
+                    //更新视图
                     data.clear();
                     adapter.notifyDataSetChanged();
+                    //再次开启LongRunningService这个服务
+                    Intent serviceIntent = new Intent(DayPlanActivity.this, LongRunningService.class);
+                    //先关闭服务，会取消之前设的所有闹钟，然后重新开启服务，重新设闹钟
+                    stopService(serviceIntent);
+                    //开启Service
+                    startService(serviceIntent);
                 }
             });
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -222,9 +220,8 @@ public class DayPlanActivity extends AppCompatActivity implements View.OnClickLi
                         Toast.makeText(DayPlanActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
                         //再次开启LongRunningService这个服务,以取消提醒。
                         Intent serviceIntent = new Intent(DayPlanActivity.this, LongRunningService.class);
-                        serviceIntent.putExtra("id",id);
-                        Log.e("cheng","**********id**"+id);
                         //开启关闭Service
+                        stopService(serviceIntent);
                         startService(serviceIntent);
                     }
                 }

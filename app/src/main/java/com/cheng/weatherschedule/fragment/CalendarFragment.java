@@ -230,7 +230,6 @@ private ImageView imNow;
                     String scheduleYear = calV.getShowYear();
                     String scheduleMonth = calV.getShowMonth();
                     //Toast.makeText(getActivity(), scheduleYear + "-" + scheduleMonth + "-" + scheduleDay,Toast.LENGTH_LONG).show();
-
                     //到当日计划界面
                     Intent intent=new Intent(getActivity(), DayPlanActivity.class);
                     intent.putExtra("date",scheduleYear + "-" + scheduleMonth + "-" + scheduleDay);

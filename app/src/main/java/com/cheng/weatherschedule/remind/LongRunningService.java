@@ -6,8 +6,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.cheng.weatherschedule.bean.Plan;
 import com.cheng.weatherschedule.dao.PlanDao;
@@ -29,16 +27,6 @@ public class LongRunningService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //删除计划的时候会传入要删除计划的id
-        int deleteId=intent.getIntExtra("id",-1);//删除单条计划
-        Log.e("cheng","**************intent id"+deleteId);
-        List<Integer> deleteIds= (List<Integer>) intent.getSerializableExtra("ids");
-//        if(deleteId!=-1){
-//            if(deleteIds==null){
-//                deleteIds=new ArrayList<>();
-//            }
-//            deleteIds.add(deleteId);
-//        }
         //获取数据库中所有计划
         PlanDao planDao=new PlanDaoImpl(LongRunningService.this);
         List<Plan> plans=planDao.findAll();
@@ -55,10 +43,13 @@ public class LongRunningService extends Service {
                     int hour=Integer.parseInt(remindTime.split(":")[0]);
                     int minutes=Integer.parseInt(remindTime.split(":")[1]);
                     int id=plan.getId();
-                    startRemind(hour,minutes,id,deleteId,deleteIds);
+                    startRemind(hour,minutes,id);
                 }
             }
         }
+
+                //手动返回START_STICKY，亲测当service因内存不足被kill，当内存又有的时候，service又被重新创建
+        flags = START_STICKY;
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -71,26 +62,19 @@ public class LongRunningService extends Service {
         for(Plan plan:plans){
             stopRemind(plan.getId());
         }
+        Intent sevice = new Intent(this, LongRunningService.class);
+        this.startService(sevice);
     }
 
     /**
      *
      * @param hour  设定闹钟的小时
      * @param minutes 设定闹钟的分钟
-     * @param id    设定多个闹钟，需要每次不一样的参数，使用plandid
-     * @param  deleteIds 删除计划的时候，要删除id对应的提醒
+     * @param id    设定多个闹钟，需要每次不一样的参数，使用plandid较合适
+     *
      */
-    private void startRemind(int hour, int minutes,int id,int deleteId,List<Integer> deleteIds) {
-        //删除计划的时候，要删除id对应的提醒
-        if(deleteIds!=null&&deleteIds.size()!=0){
-            for(int deId:deleteIds){
-                //Log.e("cheng","**********for"+deleteId);
-                stopRemind(deId);
-            }
-        }
-        if(deleteId!=-1){
-            stopRemind(deleteId);
-        }
+    private void startRemind(int hour, int minutes,int id) {
+
         AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
         //得到日历实例，主要是为了下面的获取时间
         Calendar mCalendar = Calendar.getInstance();
@@ -121,8 +105,8 @@ public class LongRunningService extends Service {
         }
         Intent i = new Intent(this, AlarmReceiver.class);
 
-        //PendingIntent pi = PendingIntent.getBroadcast(this,id, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent pi = PendingIntent.getBroadcast(this,id, i, 0);
+        PendingIntent pi = PendingIntent.getBroadcast(this,id, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        //PendingIntent pi = PendingIntent.getBroadcast(this,id, i, 0);
         //ELAPSED_REALTIME_WAKEUP表示让定时任务的出发时间从系统开机算起(相对时间），并且会唤醒CPU。
         //manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis(), pi);
         //第一个参数是AlarmManager.RTC_WAKEUP时,当系统时间大于设定的selectTime,执行pi
@@ -134,13 +118,12 @@ public class LongRunningService extends Service {
      * 关闭提醒
      */
     private void stopRemind(int deleteId) {
-        Log.e("cheng","**********stopRemind"+deleteId);
         Intent intent = new Intent(this, AlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(this, deleteId,
-                intent, 0);
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
         //取消警报
         am.cancel(pi);
-        Toast.makeText(this, "关闭了提醒",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this,"关闭了提醒",Toast.LENGTH_SHORT).show();
     }
 }
