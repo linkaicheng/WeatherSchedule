@@ -42,6 +42,7 @@ public class DayPlanActivity extends AppCompatActivity implements View.OnClickLi
     //数据源
     private List<Map<String, Object>> data = null;
     private Adapter adapter;
+    //日期
     String date;
 
     @Override
