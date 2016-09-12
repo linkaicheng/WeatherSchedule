@@ -96,7 +96,6 @@ public class WeatherFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser){
             //每次启动显示的城市为之前（切换城市）所设定的城市，从数据库中获取
-
             CityHistory helper = new CityHistory(getActivity());
             SQLiteDatabase db = helper.getReadableDatabase();
             Cursor cursor = db.query("cities", null, null, null, null, null, "id desc", "1");

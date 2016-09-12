@@ -8,14 +8,14 @@
     <RadioGroup
         android:id="@+id/rgMain"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="50dp"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
 
         >
         <RadioButton
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text="天气"
             android:id="@+id/rbWeather"
             android:checked="true"
@@ -23,7 +23,7 @@
         <RadioButton
 
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text="日历"
             style="@style/style_RadioButton"
             android:id="@+id/rbCalendar" />
@@ -31,15 +31,16 @@
 
         <RadioButton
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="提醒"
+            android:layout_height="match_parent"
+            android:text="计划"
             android:id="@+id/rbRemind"
             style="@style/style_RadioButton"/>
     </RadioGroup>
     <android.support.v4.view.ViewPager
+
         android:id="@+id/vpMain"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_above="@id/rgMain"
         />
 
