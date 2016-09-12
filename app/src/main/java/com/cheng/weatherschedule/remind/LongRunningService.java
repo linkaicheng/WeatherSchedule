@@ -121,7 +121,8 @@ public class LongRunningService extends Service {
         }
         Intent i = new Intent(this, AlarmReceiver.class);
 
-        PendingIntent pi = PendingIntent.getBroadcast(this,id, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        //PendingIntent pi = PendingIntent.getBroadcast(this,id, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pi = PendingIntent.getBroadcast(this,id, i, 0);
         //ELAPSED_REALTIME_WAKEUP表示让定时任务的出发时间从系统开机算起(相对时间），并且会唤醒CPU。
         //manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis(), pi);
         //第一个参数是AlarmManager.RTC_WAKEUP时,当系统时间大于设定的selectTime,执行pi
@@ -137,9 +138,9 @@ public class LongRunningService extends Service {
         Intent intent = new Intent(this, AlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(this, deleteId,
                 intent, 0);
-        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
         //取消警报
         am.cancel(pi);
-        Toast.makeText(this, "关闭了提醒", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "关闭了提醒",Toast.LENGTH_SHORT).show();
     }
 }

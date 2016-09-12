@@ -24,7 +24,6 @@ import com.cheng.weatherschedule.daoImpl.PlanDaoImpl;
 import com.cheng.weatherschedule.db.PlanHelper;
 import com.cheng.weatherschedule.remind.LongRunningService;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -100,9 +99,10 @@ public class DayPlanActivity extends AppCompatActivity implements View.OnClickLi
                deleteDayPlan();
                 //再次开启LongRunningService这个服务
                 Intent serviceIntent = new Intent(this, LongRunningService.class);
-                if(ids!=null&&ids.size()!=0){
-                    serviceIntent.putExtra("ids", (Serializable) ids);
-                }
+//                if(ids!=null&&ids.size()!=0){
+//                    serviceIntent.putExtra("ids", (Serializable) ids);
+//                }
+                stopService(serviceIntent);
                 //开启Service
                 startService(serviceIntent);
                 break;
