@@ -214,7 +214,7 @@ public class DayPlanActivity extends AppCompatActivity implements View.OnClickLi
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     int count = planDao.deletePlan(id);
-                    Log.e("cheng","************count*"+count);
+                   // Log.e("cheng","************count*"+count);
                     data.remove(position);
                     adapter.notifyDataSetChanged();
                     if (count != 0) {

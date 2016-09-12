@@ -13,7 +13,6 @@ import com.cheng.weatherschedule.bean.Plan;
 import com.cheng.weatherschedule.dao.PlanDao;
 import com.cheng.weatherschedule.daoImpl.PlanDaoImpl;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -32,14 +31,14 @@ public class LongRunningService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         //删除计划的时候会传入要删除计划的id
         int deleteId=intent.getIntExtra("id",-1);//删除单条计划
-        //Log.e("cheng","**************intent id"+deleteId);
+        Log.e("cheng","**************intent id"+deleteId);
         List<Integer> deleteIds= (List<Integer>) intent.getSerializableExtra("ids");
-        if(deleteId!=-1){
-            if(deleteIds==null){
-                deleteIds=new ArrayList<>();
-            }
-            deleteIds.add(deleteId);
-        }
+//        if(deleteId!=-1){
+//            if(deleteIds==null){
+//                deleteIds=new ArrayList<>();
+//            }
+//            deleteIds.add(deleteId);
+//        }
         //获取数据库中所有计划
         PlanDao planDao=new PlanDaoImpl(LongRunningService.this);
         List<Plan> plans=planDao.findAll();
@@ -56,7 +55,7 @@ public class LongRunningService extends Service {
                     int hour=Integer.parseInt(remindTime.split(":")[0]);
                     int minutes=Integer.parseInt(remindTime.split(":")[1]);
                     int id=plan.getId();
-                    startRemind(hour,minutes,id,deleteIds);
+                    startRemind(hour,minutes,id,deleteId,deleteIds);
                 }
             }
         }
@@ -81,14 +80,16 @@ public class LongRunningService extends Service {
      * @param id    设定多个闹钟，需要每次不一样的参数，使用plandid
      * @param  deleteIds 删除计划的时候，要删除id对应的提醒
      */
-    private void startRemind(int hour, int minutes,int id,List<Integer> deleteIds) {
+    private void startRemind(int hour, int minutes,int id,int deleteId,List<Integer> deleteIds) {
         //删除计划的时候，要删除id对应的提醒
         if(deleteIds!=null&&deleteIds.size()!=0){
-            for(int deleteId:deleteIds){
-                Log.e("cheng","**********for"+deleteId);
-
-                stopRemind(deleteId);
+            for(int deId:deleteIds){
+                //Log.e("cheng","**********for"+deleteId);
+                stopRemind(deId);
             }
+        }
+        if(deleteId!=-1){
+            stopRemind(deleteId);
         }
         AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
         //得到日历实例，主要是为了下面的获取时间

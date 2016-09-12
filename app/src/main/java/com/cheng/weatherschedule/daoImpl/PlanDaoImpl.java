@@ -91,9 +91,10 @@ public class PlanDaoImpl implements PlanDao {
     public List<Integer> findIdsByDate(String date) {
         SQLiteDatabase db=helper.getReadableDatabase();
         List<Integer> ids=new ArrayList<>();
-        Cursor cursor=db.query("plans",new String[]{},"date=?",new String[]{date},null,null,null);
-        if(cursor.moveToNext()){
+        Cursor cursor=db.query("plans",new String[]{"id"},"date=?",new String[]{date},null,null,null);
+      while(cursor.moveToNext()){
             ids.add(cursor.getInt(cursor.getColumnIndex("id")));
+           // Log.e("cheng","******finids"+cursor.getInt(cursor.getColumnIndex("id")));
         }
 
         return ids;
