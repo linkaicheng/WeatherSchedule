@@ -18,7 +18,7 @@
 
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="210dp"
+        android:layout_height="240dp"
         android:id="@+id/lvPlans"
         android:background="@color/white"
         android:layout_weight="0.60" />
