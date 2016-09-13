@@ -29,11 +29,11 @@ public class AlarmReceiver extends BroadcastReceiver {
         PlanDao planDao=new PlanDaoImpl(context);
         List<Plan> plans=planDao.findAll();
         Calendar calendar=Calendar.getInstance();
-       String title=null;
+        String title=null;
         String text=null;
         if(plans!=null){
             for(Plan plan:plans){
-                //如果计划设定的提醒时间是当前时间，获取，title和text
+                //如果计划设定的提醒时间是当前时间，获取title和text
                 if(plan.getRemindTime().equals(calendar.get(Calendar.HOUR_OF_DAY)
                         +":"+calendar.get(Calendar.MINUTE))){
                     title=plan.getTitle();
