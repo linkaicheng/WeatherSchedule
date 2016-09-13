@@ -140,4 +140,6 @@ public class LongRunningService extends Service {
         am.cancel(pi);
         //Toast.makeText(this,"关闭了提醒",Toast.LENGTH_SHORT).show();
     }
+
+
 }
