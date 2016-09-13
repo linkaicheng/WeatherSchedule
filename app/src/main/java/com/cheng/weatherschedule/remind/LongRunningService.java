@@ -9,7 +9,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
 
-import com.cheng.weatherschedule.MainActivity;
 import com.cheng.weatherschedule.R;
 import com.cheng.weatherschedule.bean.Plan;
 import com.cheng.weatherschedule.dao.PlanDao;
@@ -52,8 +51,8 @@ public class LongRunningService extends Service {
             }
         }
         //设为前台线程
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+       // Intent notificationIntent = new Intent(this, MainActivity.class);
+        //PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
         NotificationCompat.Builder builder=new NotificationCompat.Builder(this);
         builder.setSmallIcon(R.mipmap.icon);
         builder.setContentTitle("天气日程通");
@@ -111,10 +110,11 @@ public class LongRunningService extends Service {
         //获取上面设置时间的毫秒值
         long selectTime = mCalendar.getTimeInMillis();
 
-        // 如果当前时间大于设置的时间，直接返回，不设置闹钟
+        // 如果当前时间大于设置的时间，直接返回，不设置提醒
         if (systemTime > selectTime) {
-//            mCalendar.add(Calendar.DAY_OF_MONTH, 1);
-//            selectTime = mCalendar.getTimeInMillis();
+            //或者第二天再提醒
+            // mCalendar.add(Calendar.DAY_OF_MONTH, 1);
+            //selectTime = mCalendar.getTimeInMillis();
             return;
         }
         Intent i = new Intent(this, AlarmReceiver.class);

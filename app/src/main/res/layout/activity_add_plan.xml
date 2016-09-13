@@ -20,7 +20,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="计划名称："
+            android:text="标题："
             android:layout_gravity="center"
             />
         <EditText
@@ -59,7 +59,7 @@ android:gravity="right"
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="详细说明："
+            android:text="说明："
             android:layout_gravity="center"
             android:inputType="textMultiLine"
             />
@@ -117,7 +117,7 @@ android:gravity="right"
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="提醒时间："
+            android:text="提醒："
             />
         <TextView
             android:layout_width="205dp"
