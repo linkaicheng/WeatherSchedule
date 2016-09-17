@@ -125,7 +125,6 @@ public class LongRunningService extends Service {
         //manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis(), pi);
         //第一个参数是AlarmManager.RTC_WAKEUP时,当系统时间大于设定的selectTime,执行pi
         manager.set(AlarmManager.RTC_WAKEUP, selectTime, pi);
-
     }
 
     /**

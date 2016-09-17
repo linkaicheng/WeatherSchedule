@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         fragments.add(remindFragment);
         vpMain.setAdapter(new MyFragmentAdapter(getSupportFragmentManager(),fragments));
         vpMain.setCurrentItem(0);
-       vpMain.addOnPageChangeListener(new MyPageChangeListener());
+        vpMain.addOnPageChangeListener(new MyPageChangeListener());
     }
     private class MyOnCheckChangeListener implements RadioGroup.OnCheckedChangeListener{
         @Override
